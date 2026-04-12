@@ -34,17 +34,20 @@
         .product-card { background: var(--dark-2); border: 1px solid var(--dark-3); border-radius: 12px; overflow: hidden; transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s; }
         .product-card:hover { border-color: #555; transform: translateY(-2px); }
         .product-card.has-qty { border-color: var(--orange); box-shadow: 0 0 0 1px var(--orange), 0 4px 20px rgba(255,107,0,0.15); }
+        .product-card.out-of-stock { opacity: 0.5; }
         .product-img { width: 100%; aspect-ratio: 1 / 1; object-fit: cover; background: var(--dark-3); display: block; }
         .product-img-error { display: none; width: 100%; aspect-ratio: 1 / 1; background: var(--dark-3); align-items: center; justify-content: center; color: var(--gray); font-size: 0.78rem; }
         .product-info { padding: 13px; }
         .product-code { font-size: 0.72rem; color: var(--gray); font-weight: 500; letter-spacing: 0.5px; margin-top: 4px; }
         .product-name { font-size: 0.92rem; font-weight: 700; color: var(--white); line-height: 1.35; }
         .product-sub { font-size: 0.8rem; color: #aaa; margin-top: 2px; }
+        .out-of-stock-label { font-size: 0.72rem; font-weight: 700; color: #ff6b6b; text-transform: uppercase; letter-spacing: 1px; margin-top: 8px; }
         .qty-control { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
         .qty-label { font-size: 0.74rem; color: var(--gray); flex: 1; }
         select.qty-select { background: var(--dark-3); border: 1px solid #444; color: var(--white); padding: 6px 8px; border-radius: 6px; font-size: 0.88rem; font-family: inherit; cursor: pointer; transition: border-color 0.2s; appearance: auto; }
         select.qty-select:focus { outline: none; border-color: var(--orange); }
         select.qty-select option { background: var(--dark-3); color: var(--white); }
+        select.qty-select:disabled { opacity: 0.4; cursor: not-allowed; }
         .order-summary { background: var(--dark-2); border: 1px solid var(--dark-3); border-radius: 12px; padding: 22px 24px; margin-top: 40px; }
         .summary-title { font-size: 0.95rem; font-weight: 700; color: var(--white); margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
         .summary-empty { color: var(--gray); font-size: 0.88rem; font-style: italic; }
@@ -193,7 +196,7 @@
                 <div class="payment-icon">📋</div>
                 <div>
                     <strong>Betaling op factuur – 30 dagen betalingstermijn</strong>
-                    <p>Na het plaatsen van uw bestelling ontvangt u een orderbevestiging per e-mail. De factuur wordt bij de levering meegestuurd en dient binnen 30 dagen na factuurdatum te worden voldaan.</p>
+                    <p>Na het plaatsen van uw bestelling nemen wij contact met u op voor verdere verwerking. De factuur wordt bij de levering meegestuurd en dient binnen 30 dagen te worden voldaan.</p>
                 </div>
             </div>
 
@@ -202,7 +205,7 @@
                     <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                     Bestelling plaatsen
                 </button>
-                <div class="submit-note">U ontvangt een bevestiging op het opgegeven e-mailadres.</div>
+                <div class="submit-note">Wij nemen zo spoedig mogelijk contact met u op.</div>
                 <div class="error-msg" id="error-msg">Er is iets misgegaan bij het verzenden van uw bestelling. Controleer uw verbinding en probeer het opnieuw.</div>
             </div>
         </form>
@@ -212,10 +215,9 @@
 <div id="success-page">
     <div class="success-icon">✓</div>
     <h2 class="success-title">Bestelling <span>geplaatst!</span></h2>
-    <p class="success-text">Bedankt voor uw bestelling bij GrabNGo. U ontvangt binnen enkele minuten een bevestiging op uw e-mailadres. Ons team verwerkt uw bestelling zo spoedig mogelijk.</p>
+    <p class="success-text">Bedankt voor uw bestelling! We gaan direct aan de slag en verwerken uw order zo spoedig mogelijk.</p>
     <div class="success-cards">
         <div class="success-card"><strong>Betaling</strong><span>Factuur · 30 dagen</span></div>
-        <div class="success-card"><strong>Bevestiging</strong><span>Per e-mail verstuurd</span></div>
         <div class="success-card"><strong>Verwerking</strong><span>Binnen 1 werkdag</span></div>
     </div>
     <button class="new-order-btn" onclick="resetForm()">Nieuwe bestelling plaatsen</button>
@@ -226,7 +228,6 @@
         <div>
             <img class="footer-logo-img" src="https://rhodelta.hypernode.io/wp-content/uploads/2024/04/GNG-plain-logo-wit.png" alt="GrabNGo">
             <p class="footer-tagline">Exclusief B2B-bestelportaal voor zakelijke partners van GrabNGo.</p>
-            <p class="footer-tagline" style="margin-top:10px;color:#666;">Alle prijzen zijn excl. BTW. Betaling op factuur binnen 30 dagen.</p>
         </div>
         <div class="footer-details">
             <div style="font-weight:700;color:#ccc;margin-bottom:4px;">Mobile Express B.V.</div>
@@ -250,13 +251,13 @@
         { code: '16079', name: 'Cable USB to 8-PIN',       sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16079.jpg' },
         { code: '37000', name: 'Cable USB-C to 8-PIN',     sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37000.jpg' },
         { code: '37002', name: 'Cable USB-C to 8-PIN',     sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37002.jpg' },
-        { code: '16876', name: 'Cable USB to Micro-USB',   sub: '1m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16876.jpg' },
+        { code: '16876', name: 'Cable USB to Micro-USB',   sub: '1m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16876.jpg', outOfStock: true },
         { code: '37040', name: 'Cable USB to USB-C',       sub: '1m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37040.jpg' },
         { code: '16072', name: 'Cable USB to USB-C',       sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16072.jpg' },
         { code: '16073', name: 'Cable USB to USB-C',       sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16072.jpg' },
         { code: '37010', name: 'Cable USB-C to USB-C',     sub: '1m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37010.jpg' },
         { code: '37011', name: 'Cable USB-C to USB-C',     sub: '2m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37011.jpg' },
-        { code: '16075', name: 'Cable USB-C to USB-C',     sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16075.jpg' },
+        { code: '16075', name: 'Cable USB-C to USB-C',     sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16075.jpg', outOfStock: true },
         { code: '37003', name: 'Cable USB-C to USB-C',     sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37003.jpg' },
         { code: '37009', name: 'Wall Charger USB + USB-C', sub: '20W – White',      img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37009.jpg' },
         { code: '37008', name: 'Wall Charger USB + USB-C', sub: '20W – Black',      img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37008.jpg' },
@@ -267,7 +268,8 @@
         { code: '37001', name: 'GrabNGo Luxe Display',     sub: '5 shelves + lock', img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37001.jpg', display: true },
     ];
 
-    function buildOptions(isDisplay) {
+    function buildOptions(isDisplay, outOfStock) {
+        if (outOfStock) return '<option value="0">Niet op voorraad</option>';
         let html = '<option value="0">– kies –</option>';
         if (isDisplay) {
             for (let i = 1; i <= 6; i++) html += `<option value="${i}">${i} stuks</option>`;
@@ -280,7 +282,7 @@
     const grid = document.getElementById('products-grid');
     products.forEach(p => {
         const card = document.createElement('div');
-        card.className = 'product-card';
+        card.className = 'product-card' + (p.outOfStock ? ' out-of-stock' : '');
         card.id = `card-${p.code}`;
         card.innerHTML = `
             <img class="product-img" src="${p.img}" alt="${p.name}" loading="lazy"
@@ -290,10 +292,12 @@
                 <div class="product-name">${p.name}</div>
                 <div class="product-sub">${p.sub || ''}</div>
                 <div class="product-code">#${p.code}</div>
+                ${p.outOfStock ? '<div class="out-of-stock-label">Niet op voorraad</div>' : ''}
                 <div class="qty-control">
                     <span class="qty-label">Aantal:</span>
                     <select class="qty-select" name="qty_${p.code}" id="qty_${p.code}"
-                        onchange="onQtyChange('${p.code}', this.value)">${buildOptions(p.display)}</select>
+                        ${p.outOfStock ? 'disabled' : `onchange="onQtyChange('${p.code}', this.value)"`}
+                    >${buildOptions(p.display, p.outOfStock)}</select>
                 </div>
             </div>
         `;
@@ -311,6 +315,7 @@
         list.innerHTML = '';
         let hasItems = false;
         products.forEach(p => {
+            if (p.outOfStock) return;
             const qty = parseInt(document.getElementById(`qty_${p.code}`).value) || 0;
             if (qty > 0) {
                 hasItems = true;
@@ -326,6 +331,7 @@
         e.preventDefault();
         const lines = [];
         products.forEach(p => {
+            if (p.outOfStock) return;
             const qty = parseInt(document.getElementById(`qty_${p.code}`).value) || 0;
             if (qty > 0) lines.push(`${p.name} ${p.sub} (#${p.code}): ${qty}x`);
         });

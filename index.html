@@ -1,0 +1,819 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GrabNGo – B2B Bestelportaal</title>
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --orange: #FF6B00;
+            --orange-dark: #CC5500;
+            --orange-light: #FF8C33;
+            --black: #0D0D0D;
+            --dark: #1A1A1A;
+            --dark-2: #242424;
+            --dark-3: #333;
+            --gray: #888;
+            --white: #FFFFFF;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: var(--black);
+            color: var(--white);
+            line-height: 1.6;
+        }
+
+        /* ── HEADER ── */
+        header {
+            background: #000;
+            border-bottom: 1px solid #2a2a2a;
+            padding: 16px 0;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 16px rgba(0,0,0,0.6);
+        }
+        .header-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 24px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .logo-img { height: 42px; display: block; }
+        .logo-sub { font-size: 0.68rem; color: var(--gray); letter-spacing: 3px; text-transform: uppercase; margin-top: 5px; }
+        .header-badge {
+            background: #222;
+            color: #bbb;
+            border: 1px solid #3a3a3a;
+            font-weight: 600;
+            font-size: 0.72rem;
+            padding: 6px 14px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ── HERO ── */
+        .hero {
+            background: linear-gradient(135deg, #141414 0%, #1e1e1e 50%, #242424 100%);
+            padding: 80px 24px;
+            text-align: center;
+            border-bottom: 1px solid var(--dark-3);
+            position: relative;
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at 50% 0%, rgba(255,107,0,0.08) 0%, transparent 65%);
+            pointer-events: none;
+        }
+        .hero h1 {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 16px;
+        }
+        .hero h1 em { color: var(--orange); font-style: normal; }
+        .hero p { font-size: 1.05rem; color: #aaa; max-width: 580px; margin: 0 auto 32px; }
+        .hero-badges { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+        .badge {
+            background: var(--dark-2);
+            border: 1px solid var(--dark-3);
+            color: var(--gray);
+            padding: 8px 16px;
+            border-radius: 100px;
+            font-size: 0.82rem;
+            display: flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .badge .dot { width: 8px; height: 8px; background: var(--orange); border-radius: 50%; flex-shrink: 0; }
+
+        /* ── SECTION ── */
+        .section { max-width: 1200px; margin: 0 auto; padding: 56px 24px; }
+        .section-title { font-size: 1.5rem; font-weight: 800; }
+        .section-title span { color: var(--orange); }
+        .section-sub { color: var(--gray); font-size: 0.92rem; margin-top: 8px; margin-bottom: 36px; }
+        .divider { width: 44px; height: 3px; background: var(--orange); margin: 10px 0 28px; }
+
+        /* ── FEATURED DISPLAY CARD ── */
+        .featured-card {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            gap: 0;
+            background: var(--dark-2);
+            border: 1px solid var(--dark-3);
+            border-radius: 14px;
+            overflow: hidden;
+            margin-bottom: 24px;
+            transition: border-color 0.2s;
+        }
+        .featured-card:hover { border-color: #555; }
+        .featured-card.has-qty {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 1px var(--orange), 0 4px 24px rgba(255,107,0,0.12);
+        }
+        .featured-card-img {
+            width: 100%;
+            height: 100%;
+            min-height: 200px;
+            object-fit: cover;
+            display: block;
+            background: var(--dark-3);
+        }
+        .featured-card-body {
+            padding: 24px 28px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            gap: 6px;
+        }
+        .featured-badge {
+            display: inline-block;
+            background: var(--orange);
+            color: var(--black);
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 3px 10px;
+            border-radius: 4px;
+            margin-bottom: 4px;
+        }
+        .featured-card-name {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--white);
+            line-height: 1.3;
+        }
+        .featured-card-code { font-size: 0.78rem; color: var(--gray); }
+        .featured-card-desc { font-size: 0.88rem; color: #888; margin-top: 4px; line-height: 1.55; }
+        .featured-qty-row { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
+        .featured-qty-row label { font-size: 0.82rem; color: #bbb; font-weight: 600; }
+        @media (max-width: 700px) {
+            .featured-card { grid-template-columns: 1fr; }
+            .featured-card-img { min-height: 200px; max-height: 220px; }
+        }
+
+        /* ── PRODUCT GRID ── */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(185px, 1fr));
+            gap: 16px;
+        }
+        .product-card {
+            background: var(--dark-2);
+            border: 1px solid var(--dark-3);
+            border-radius: 12px;
+            overflow: hidden;
+            transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+        }
+        .product-card:hover { border-color: #555; transform: translateY(-2px); }
+        .product-card.has-qty {
+            border-color: var(--orange);
+            box-shadow: 0 0 0 1px var(--orange), 0 4px 20px rgba(255,107,0,0.15);
+        }
+        .product-img {
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            object-fit: cover;
+            background: var(--dark-3);
+            display: block;
+        }
+        .product-img-error {
+            display: none;
+            width: 100%;
+            aspect-ratio: 1 / 1;
+            background: var(--dark-3);
+            align-items: center;
+            justify-content: center;
+            color: var(--gray);
+            font-size: 0.78rem;
+        }
+        .product-info { padding: 13px; }
+        .product-code { font-size: 0.72rem; color: var(--gray); font-weight: 500; letter-spacing: 0.5px; margin-top: 6px; }
+        .product-name { font-size: 0.92rem; font-weight: 700; color: var(--white); margin-bottom: 11px; line-height: 1.35; min-height: 2.4em; }
+        .qty-control { display: flex; align-items: center; gap: 8px; }
+        .qty-label { font-size: 0.74rem; color: var(--gray); flex: 1; }
+        select.qty-select {
+            background: var(--dark-3);
+            border: 1px solid #444;
+            color: var(--white);
+            padding: 6px 8px;
+            border-radius: 6px;
+            font-size: 0.88rem;
+            font-family: inherit;
+            cursor: pointer;
+            transition: border-color 0.2s;
+            appearance: auto;
+        }
+        select.qty-select:focus { outline: none; border-color: var(--orange); }
+        select.qty-select option { background: var(--dark-3); color: var(--white); }
+
+        /* ── SAMENVATTING ── */
+        .order-summary {
+            background: var(--dark-2);
+            border: 1px solid var(--dark-3);
+            border-radius: 12px;
+            padding: 22px 24px;
+            margin-top: 40px;
+        }
+        .summary-title {
+            font-size: 0.95rem;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .summary-empty { color: var(--gray); font-size: 0.88rem; font-style: italic; }
+        #summary-list { list-style: none; }
+        #summary-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 7px 0;
+            border-bottom: 1px solid var(--dark-3);
+            font-size: 0.88rem;
+            color: #ccc;
+        }
+        #summary-list li:last-child { border-bottom: none; }
+        .qty-badge {
+            background: var(--orange);
+            color: var(--black);
+            font-weight: 700;
+            font-size: 0.74rem;
+            padding: 2px 9px;
+            border-radius: 100px;
+            white-space: nowrap;
+        }
+
+        /* ── KLANTGEGEVENS ── */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+            gap: 18px;
+        }
+        .form-group { display: flex; flex-direction: column; gap: 6px; }
+        .form-group.full { grid-column: 1 / -1; }
+        label { font-size: 0.8rem; font-weight: 600; color: #bbb; letter-spacing: 0.4px; }
+        label .req { color: var(--orange); margin-left: 2px; }
+        input[type="text"],
+        input[type="email"],
+        input[type="tel"],
+        textarea {
+            background: var(--dark-2);
+            border: 1px solid var(--dark-3);
+            color: var(--white);
+            padding: 11px 14px;
+            border-radius: 8px;
+            font-size: 0.93rem;
+            font-family: inherit;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            width: 100%;
+        }
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: var(--orange);
+            box-shadow: 0 0 0 3px rgba(255,107,0,0.1);
+        }
+        input::placeholder, textarea::placeholder { color: #4a4a4a; }
+        textarea { resize: vertical; min-height: 90px; }
+
+        /* ── BETALING INFO ── */
+        .payment-info {
+            background: linear-gradient(135deg, #1e1400, var(--dark-2));
+            border: 1px solid #3d2c00;
+            border-left: 4px solid var(--orange);
+            border-radius: 10px;
+            padding: 20px 24px;
+            margin: 36px 0;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+        }
+        .payment-icon { font-size: 1.4rem; flex-shrink: 0; margin-top: 1px; }
+        .payment-info strong { color: var(--orange); font-size: 0.93rem; display: block; margin-bottom: 5px; }
+        .payment-info p { color: #999; font-size: 0.86rem; line-height: 1.55; }
+
+        /* ── SUBMIT ── */
+        .submit-section { text-align: center; padding: 16px 0 8px; }
+        .submit-btn {
+            background: var(--orange);
+            color: var(--black);
+            border: none;
+            padding: 17px 44px;
+            font-size: 1rem;
+            font-weight: 800;
+            border-radius: 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: background 0.2s, transform 0.1s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .submit-btn:hover { background: var(--orange-light); transform: translateY(-1px); }
+        .submit-btn:active { transform: translateY(0); }
+        .submit-btn:disabled { background: #555; cursor: not-allowed; transform: none; }
+        .submit-note { color: var(--gray); font-size: 0.8rem; margin-top: 10px; }
+
+        .error-msg {
+            background: #2a1515;
+            border: 1px solid #5a2020;
+            color: #ff8080;
+            border-radius: 8px;
+            padding: 13px 18px;
+            margin-top: 16px;
+            font-size: 0.88rem;
+            display: none;
+            max-width: 520px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .error-msg.visible { display: block; }
+
+        /* ── SUCCES PAGINA ── */
+        #success-page {
+            display: none;
+            min-height: 80vh;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            text-align: center;
+            padding: 60px 24px;
+        }
+        #success-page.visible { display: flex; }
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--orange);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2.5rem;
+            margin: 0 auto 32px;
+            animation: pop 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes pop { from { transform: scale(0); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .success-title { font-size: clamp(2rem, 5vw, 2.8rem); font-weight: 900; margin-bottom: 16px; }
+        .success-title span { color: var(--orange); }
+        .success-text { color: #aaa; font-size: 1rem; max-width: 500px; line-height: 1.75; margin-bottom: 36px; }
+        .success-cards { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; margin-bottom: 40px; }
+        .success-card {
+            background: var(--dark-2);
+            border: 1px solid var(--dark-3);
+            border-radius: 10px;
+            padding: 18px 26px;
+            min-width: 150px;
+        }
+        .success-card strong { display: block; font-size: 0.72rem; color: var(--orange); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 5px; }
+        .success-card span { font-size: 0.95rem; color: var(--white); font-weight: 600; }
+        .new-order-btn {
+            background: transparent;
+            color: var(--orange);
+            border: 2px solid var(--orange);
+            padding: 13px 30px;
+            font-size: 0.95rem;
+            font-weight: 700;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s, color 0.2s;
+        }
+        .new-order-btn:hover { background: var(--orange); color: var(--black); }
+
+        /* ── FOOTER ── */
+        footer {
+            background: #000;
+            border-top: 1px solid #2a2a2a;
+            padding: 48px 24px 32px;
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+        .footer-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr auto;
+            gap: 40px;
+            align-items: start;
+        }
+        .footer-logo-img { height: 36px; display: block; margin-bottom: 14px; }
+        .footer-tagline { color: #555; font-size: 0.82rem; max-width: 340px; line-height: 1.6; }
+        .footer-details { display: flex; flex-direction: column; gap: 7px; text-align: right; }
+        .footer-details a { color: var(--gray); text-decoration: none; }
+        .footer-details a:hover { color: var(--white); }
+        .footer-details span { color: #555; }
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 32px auto 0;
+            padding-top: 20px;
+            border-top: 1px solid #1e1e1e;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 8px;
+            font-size: 0.78rem;
+            color: #444;
+        }
+        @media (max-width: 600px) {
+            .footer-inner { grid-template-columns: 1fr; }
+            .footer-details { text-align: left; }
+            .footer-bottom { flex-direction: column; align-items: flex-start; }
+        }
+
+        .page-sep { height: 1px; background: var(--dark-3); }
+
+        /* ── DISPLAY PROMO ── */
+        .display-promo {
+            background: linear-gradient(135deg, #141414 0%, #1c1c1c 100%);
+            border-bottom: 1px solid var(--dark-3);
+        }
+        .display-promo-inner {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 56px 24px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 56px;
+            align-items: center;
+        }
+        .display-promo-text { order: 1; }
+        .display-promo h2 {
+            font-size: clamp(1.4rem, 3vw, 2rem);
+            font-weight: 900;
+            line-height: 1.2;
+            margin-bottom: 14px;
+        }
+        .display-promo h2 em { color: var(--orange); font-style: normal; }
+        .display-promo p {
+            color: #999;
+            font-size: 0.95rem;
+            line-height: 1.7;
+            max-width: 420px;
+        }
+        .display-promo-img-wrap { order: 2; position: relative; }
+        .display-promo-img {
+            width: 100%;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 12px;
+            display: block;
+        }
+        @media (max-width: 760px) {
+            .display-promo-inner { grid-template-columns: 1fr; gap: 32px; }
+            .display-promo-img-wrap { order: -1; }
+            .display-promo-img { max-height: 260px; }
+        }
+
+        /* ── RESPONSIVE ── */
+        @media (max-width: 600px) {
+            .products-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .hero { padding: 48px 18px; }
+            .header-badge { display: none; }
+            .section { padding: 40px 16px; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+    <div class="header-inner">
+        <div>
+            <img class="logo-img" src="https://rhodelta.hypernode.io/wp-content/uploads/2024/04/GNG-plain-logo-wit.png" alt="GrabNGo">
+            <div class="logo-sub">B2B Bestelportaal</div>
+        </div>
+        <div class="header-badge">Alleen voor zakelijke klanten</div>
+    </div>
+</header>
+
+<!-- HOOFDPAGINA -->
+<div id="main-content">
+
+    <!-- HERO -->
+    <section class="hero">
+        <h1>Bestel direct bij<br><em>GrabNGo</em></h1>
+        <p>Ons B2B-bestelportaal voor geregistreerde zakelijke partners. Selecteer producten, vul uw gegevens in en wij zorgen voor snelle verwerking en facturatie.</p>
+        <div class="hero-badges">
+            <div class="badge"><span class="dot"></span> Betaling op factuur – 30 dagen</div>
+            <div class="badge"><span class="dot"></span> 19 producten beschikbaar</div>
+            <div class="badge"><span class="dot"></span> Snelle orderverwerking</div>
+        </div>
+    </section>
+
+    <div class="page-sep"></div>
+
+    <!-- FORM -->
+    <div class="section">
+
+        <!-- Formspree: vervang FORM_ID door uw eigen Formspree form-ID -->
+        <!-- Registreer via formspree.io → New Form → voeg zirevaan@mobile-express.nl toe als ontvanger -->
+        <form id="order-form" action="https://formspree.io/f/mgopgjaz" method="POST">
+
+            <!-- Verborgen velden -->
+            <input type="hidden" name="_subject" value="Nieuwe B2B Bestelling – GrabNGo">
+            <input type="hidden" name="Bestelling" id="hidden-order">
+            <input type="hidden" name="_replyto" id="hidden-replyto">
+
+            <!-- PRODUCTEN -->
+            <div class="section-title">Ons <span>assortiment</span></div>
+            <div class="divider"></div>
+            <p class="section-sub">Voer per product de gewenste hoeveelheid in. Producten zonder hoeveelheid worden niet meegenomen.</p>
+
+            <div class="products-grid" id="products-grid"></div>
+
+            <!-- SAMENVATTING -->
+            <div class="order-summary">
+                <div class="summary-title">
+                    <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="9" cy="21" r="1"/><circle cx="20" cy="21" r="1"/><path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/></svg>
+                    Overzicht geselecteerde producten
+                </div>
+                <p class="summary-empty" id="summary-empty">Nog geen producten geselecteerd.</p>
+                <ul id="summary-list"></ul>
+            </div>
+
+            <!-- KLANTGEGEVENS -->
+            <div style="margin-top: 52px;">
+                <div class="section-title">Uw <span>gegevens</span></div>
+                <div class="divider"></div>
+                <p class="section-sub">Alle velden zijn verplicht voor de verwerking van uw bestelling.</p>
+
+                <div class="form-grid">
+                    <div class="form-group full">
+                        <label for="bedrijfsnaam">Bedrijfsnaam <span class="req">*</span></label>
+                        <input type="text" id="bedrijfsnaam" name="Bedrijfsnaam" placeholder="Uw bedrijfsnaam" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="naam">Contactpersoon <span class="req">*</span></label>
+                        <input type="text" id="naam" name="Naam" placeholder="Voor- en achternaam" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="email">E-mailadres <span class="req">*</span></label>
+                        <input type="email" id="email" name="Email" placeholder="uw@bedrijf.nl" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="telefoon">Telefoonnummer <span class="req">*</span></label>
+                        <input type="tel" id="telefoon" name="Telefoon" placeholder="+31 6 12345678" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="btw">BTW-nummer <span class="req">*</span></label>
+                        <input type="text" id="btw" name="BTW-nummer" placeholder="NL123456789B01" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="adres">Straatnaam <span class="req">*</span></label>
+                        <input type="text" id="adres" name="Straatnaam" placeholder="Straatnaam" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="huisnummer">Huisnummer <span class="req">*</span></label>
+                        <input type="text" id="huisnummer" name="Huisnummer" placeholder="12 A" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="postcode">Postcode <span class="req">*</span></label>
+                        <input type="text" id="postcode" name="Postcode" placeholder="1234 AB" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="woonplaats">Woonplaats <span class="req">*</span></label>
+                        <input type="text" id="woonplaats" name="Woonplaats" placeholder="Amsterdam" required>
+                    </div>
+                    <div class="form-group full">
+                        <label for="opmerkingen">Opmerkingen</label>
+                        <textarea id="opmerkingen" name="Opmerkingen" placeholder="Eventuele opmerkingen bij uw bestelling..."></textarea>
+                    </div>
+                </div>
+            </div>
+
+            <!-- BETALING -->
+            <div class="payment-info">
+                <div class="payment-icon">📋</div>
+                <div>
+                    <strong>Betaling op factuur – 30 dagen betalingstermijn</strong>
+                    <p>Na het plaatsen van uw bestelling ontvangt u een orderbevestiging per e-mail. De factuur wordt bij de levering meegestuurd en dient binnen 30 dagen na factuurdatum te worden voldaan. Heeft u vragen over uw bestelling of factuur? Neem dan contact op met uw accountmanager.</p>
+                </div>
+            </div>
+
+            <!-- SUBMIT -->
+            <div class="submit-section">
+                <button type="submit" class="submit-btn" id="submit-btn">
+                    <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Bestelling plaatsen
+                </button>
+                <div class="submit-note">U ontvangt een bevestiging op het opgegeven e-mailadres.</div>
+                <div class="error-msg" id="error-msg">
+                    Er is iets misgegaan bij het verzenden van uw bestelling. Controleer uw verbinding en probeer het opnieuw.
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<!-- BEVESTIGINGSPAGINA -->
+<div id="success-page">
+    <div class="success-icon">✓</div>
+    <h2 class="success-title">Bestelling <span>geplaatst!</span></h2>
+    <p class="success-text">
+        Bedankt voor uw bestelling bij GrabNGo. U ontvangt binnen enkele minuten een bevestiging op uw e-mailadres. Ons team verwerkt uw bestelling zo spoedig mogelijk.
+    </p>
+    <div class="success-cards">
+        <div class="success-card">
+            <strong>Betaling</strong>
+            <span>Factuur · 30 dagen</span>
+        </div>
+        <div class="success-card">
+            <strong>Bevestiging</strong>
+            <span>Per e-mail verstuurd</span>
+        </div>
+        <div class="success-card">
+            <strong>Verwerking</strong>
+            <span>Binnen 1 werkdag</span>
+        </div>
+    </div>
+    <button class="new-order-btn" onclick="resetForm()">Nieuwe bestelling plaatsen</button>
+</div>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-inner">
+        <div>
+            <img class="footer-logo-img" src="https://rhodelta.hypernode.io/wp-content/uploads/2024/04/GNG-plain-logo-wit.png" alt="GrabNGo">
+            <p class="footer-tagline">Exclusief B2B-bestelportaal voor zakelijke partners van GrabNGo.</p>
+            <p class="footer-tagline" style="margin-top:10px;color:#666;">Alle prijzen zijn excl. BTW. Betaling op factuur binnen 30 dagen.</p>
+        </div>
+        <div class="footer-details">
+            <div style="font-weight:700;color:#ccc;margin-bottom:4px;">Mobile Express B.V.</div>
+            <div>De Entree 201, 1101HG Amsterdam</div>
+            <div style="margin-top:8px;"><span>Tel</span> &nbsp;<a href="tel:+31648044140">+31 6 48 044 140</a></div>
+            <div><span>E-mail</span> &nbsp;<a href="mailto:zirevaan@mobile-express.nl">zirevaan@mobile-express.nl</a></div>
+            <div><span>Website</span> &nbsp;<a href="https://www.grabngoshop.nl" target="_blank">www.grabngoshop.nl</a></div>
+            <div style="margin-top:8px;"><span>KvK</span> &nbsp;91946514</div>
+            <div><span>BTW-nr</span> &nbsp;NL865826882B01</div>
+        </div>
+    </div>
+    <div class="footer-bottom">
+        <span>© 2025 Mobile Express B.V. — Alle rechten voorbehouden</span>
+        <span>B2B Bestelportaal · Exclusief voor zakelijke klanten</span>
+    </div>
+</footer>
+
+<script>
+    const products = [
+        { code: '16879', name: 'Cable USB to 8-PIN',       sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16879.jpg' },
+        { code: '16079', name: 'Cable USB to 8-PIN',       sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16079.jpg' },
+        { code: '37000', name: 'Cable USB-C to 8-PIN',     sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37000.jpg' },
+        { code: '37002', name: 'Cable USB-C to 8-PIN',     sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37002.jpg' },
+        { code: '16876', name: 'Cable USB to Micro-USB',   sub: '1m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16876.jpg' },
+        { code: '37040', name: 'Cable USB to USB-C',       sub: '1m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37040.jpg' },
+        { code: '16072', name: 'Cable USB to USB-C',       sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16072.jpg' },
+        { code: '16073', name: 'Cable USB to USB-C',       sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16072.jpg' },
+        { code: '37010', name: 'Cable USB-C to USB-C',     sub: '1m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37010.jpg' },
+        { code: '37011', name: 'Cable USB-C to USB-C',     sub: '2m – Black',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37011.jpg' },
+        { code: '16075', name: 'Cable USB-C to USB-C',     sub: '1m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/16075.jpg' },
+        { code: '37003', name: 'Cable USB-C to USB-C',     sub: '2m – White',       img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37003.jpg' },
+        { code: '37009', name: 'Wall Charger USB + USB-C', sub: '20W – White',      img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37009.jpg' },
+        { code: '37008', name: 'Wall Charger USB + USB-C', sub: '20W – Black',      img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37008.jpg' },
+        { code: '37005', name: 'Car Charger USB + USB-C',  sub: '30W – Black',      img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37005.jpg' },
+        { code: '37021', name: 'Magnetic Air Vent Holder', sub: 'clip',                  img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37021.jpg' },
+        { code: '37020', name: 'Magnetic Air Vent Holder', sub: '360°',             img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37020.jpg' },
+        { code: '37030', name: 'USB-C Earphone Pro',       sub: 'with Mic – White', img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37030.jpg' },
+        { code: '37001', name: 'GrabNGo Luxe Display',     sub: '5 shelves + lock',      img: 'https://rhodelta.hypernode.io/wp-content/uploads/2024/04/37001.jpg', display: true },
+    ];
+
+    // Bouw de opties voor het dropdown-menu
+    function buildOptions(isDisplay) {
+        let html = '<option value="0">– kies –</option>';
+        if (isDisplay) {
+            for (let i = 1; i <= 6; i++) html += `<option value="${i}">${i} stuks</option>`;
+        } else {
+            for (let i = 5; i <= 100; i += 5) html += `<option value="${i}">${i} stuks</option>`;
+        }
+        return html;
+    }
+
+    // Producten renderen
+    const grid = document.getElementById('products-grid');
+    products.forEach(p => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.id = `card-${p.code}`;
+        card.innerHTML = `
+            <img class="product-img" src="${p.img}" alt="${p.name}" loading="lazy"
+                onerror="this.style.display='none';this.nextElementSibling.style.display='flex'">
+            <div class="product-img-error">Geen afbeelding</div>
+            <div class="product-info">
+                <div class="product-name">${p.name}</div>
+                <div class="product-code">${p.sub ? p.sub + ' &nbsp;|&nbsp; ' : ''}#${p.code}</div>
+                <div class="qty-control" style="margin-top:10px">
+                    <span class="qty-label">Aantal:</span>
+                    <select
+                        class="qty-select"
+                        name="qty_${p.code}"
+                        id="qty_${p.code}"
+                        onchange="onQtyChange('${p.code}', this.value)"
+                    >${buildOptions(p.display)}</select>
+                </div>
+            </div>
+        `;
+        grid.appendChild(card);
+    });
+
+    function onQtyChange(code, value) {
+        const card = document.getElementById(`card-${code}`);
+        card.classList.toggle('has-qty', parseInt(value) > 0);
+        updateSummary();
+    }
+
+    function updateSummary() {
+        const list = document.getElementById('summary-list');
+        const empty = document.getElementById('summary-empty');
+        list.innerHTML = '';
+        let hasItems = false;
+
+        // Reguliere producten
+        products.forEach(p => {
+            const qty = parseInt(document.getElementById(`qty_${p.code}`).value) || 0;
+            if (qty > 0) {
+                hasItems = true;
+                const li = document.createElement('li');
+                li.innerHTML = `<span>${p.name} <small style="color:#555">(#${p.code})</small></span><span class="qty-badge">${qty}&times;</span>`;
+                list.appendChild(li);
+            }
+        });
+
+        empty.style.display = hasItems ? 'none' : 'block';
+    }
+
+    // Formulier verzenden via Formspree AJAX
+    document.getElementById('order-form').addEventListener('submit', async function(e) {
+        e.preventDefault();
+
+        // Verzamel bestelling
+        const lines = [];
+        products.forEach(p => {
+            const qty = parseInt(document.getElementById(`qty_${p.code}`).value) || 0;
+            if (qty > 0) lines.push(`${p.name} (#${p.code}): ${qty}x`);
+        });
+
+        if (lines.length === 0) {
+            alert('Selecteer minimaal één product om een bestelling te plaatsen.');
+            return;
+        }
+
+        document.getElementById('hidden-order').value = lines.join(' | ');
+        document.getElementById('hidden-replyto').value = document.getElementById('email').value;
+
+        const btn = document.getElementById('submit-btn');
+        const errorMsg = document.getElementById('error-msg');
+        btn.disabled = true;
+        btn.textContent = 'Verzenden...';
+        errorMsg.classList.remove('visible');
+
+        try {
+            const response = await fetch(this.action, {
+                method: 'POST',
+                body: new FormData(this),
+                headers: { 'Accept': 'application/json' }
+            });
+
+            if (response.ok) {
+                showSuccess();
+            } else {
+                throw new Error();
+            }
+        } catch {
+            errorMsg.classList.add('visible');
+            btn.disabled = false;
+            btn.innerHTML = `
+                <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                Bestelling plaatsen
+            `;
+        }
+    });
+
+    function showSuccess() {
+        document.getElementById('main-content').style.display = 'none';
+        document.getElementById('success-page').classList.add('visible');
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetForm() {
+        document.getElementById('order-form').reset();
+        document.querySelectorAll('.product-card').forEach(c => c.classList.remove('has-qty'));
+        updateSummary();
+        document.getElementById('main-content').style.display = 'block';
+        document.getElementById('success-page').classList.remove('visible');
+        const btn = document.getElementById('submit-btn');
+        btn.disabled = false;
+        btn.innerHTML = `
+            <svg width="19" height="19"

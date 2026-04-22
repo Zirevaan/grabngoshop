@@ -1,0 +1,410 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>GrabNGo Bezoek</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@400;500;600&display=swap');
+
+:root {
+  --rood: #E8001D;
+  --donker: #111111;
+  --wit: #FFFFFF;
+  --groen: #00B050;
+  --oranje: #FF6B00;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--donker);
+  color: var(--wit);
+  min-height: 100vh;
+  padding-bottom: 40px;
+}
+
+.header {
+  background: var(--rood);
+  padding: 18px 20px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+.header-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 2px;
+  color: var(--wit);
+}
+.header-dag {
+  font-size: 12px;
+  color: rgba(255,255,255,0.75);
+  text-align: right;
+  line-height: 1.4;
+}
+
+.stats {
+  background: #1a1a1a;
+  padding: 12px 20px;
+  display: flex;
+  border-bottom: 1px solid #333;
+}
+.stat {
+  flex: 1;
+  text-align: center;
+  border-right: 1px solid #333;
+}
+.stat:last-child { border-right: none; }
+.stat-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 26px;
+  line-height: 1;
+}
+.stat-label {
+  font-size: 10px;
+  color: #888;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-top: 2px;
+}
+.stat-num.groen { color: var(--groen); }
+.stat-num.rood { color: var(--rood); }
+.stat-num.oranje { color: var(--oranje); }
+.stat-num.wit { color: var(--wit); }
+
+.form-wrap { padding: 16px 16px 0; }
+
+.section-label {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 13px;
+  letter-spacing: 2px;
+  color: var(--rood);
+  margin-bottom: 8px;
+  margin-top: 18px;
+}
+
+.input-field {
+  width: 100%;
+  background: #1e1e1e;
+  border: 1.5px solid #333;
+  border-radius: 10px;
+  padding: 13px 15px;
+  color: var(--wit);
+  font-family: 'DM Sans', sans-serif;
+  font-size: 15px;
+  outline: none;
+  transition: border-color 0.2s;
+  -webkit-appearance: none;
+}
+.input-field:focus { border-color: var(--rood); }
+.input-field::placeholder { color: #555; }
+
+.status-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.status-btn {
+  border: 2px solid #333;
+  border-radius: 12px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  background: #1e1e1e;
+}
+.status-btn .icon { font-size: 22px; margin-bottom: 4px; }
+.status-btn .label { font-size: 12px; font-weight: 600; color: #aaa; }
+.status-btn.vol { color: var(--groen); }
+.status-btn.vol.selected { border-color: var(--groen); background: rgba(0,176,80,0.12); }
+.status-btn.leeg { color: var(--oranje); }
+.status-btn.leeg.selected { border-color: var(--oranje); background: rgba(255,107,0,0.12); }
+.status-btn.weg { color: var(--rood); }
+.status-btn.weg.selected { border-color: var(--rood); background: rgba(232,0,29,0.12); }
+.status-btn.onbekend { color: #888; }
+.status-btn.onbekend.selected { border-color: #888; background: rgba(136,136,136,0.12); }
+
+.reactie-grid { display: flex; flex-direction: column; gap: 8px; }
+.reactie-btn {
+  border: 2px solid #333;
+  border-radius: 10px;
+  padding: 12px 15px;
+  cursor: pointer;
+  background: #1e1e1e;
+  color: #aaa;
+  font-family: 'DM Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.reactie-btn .dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+.reactie-btn.ja .dot { background: var(--groen); }
+.reactie-btn.misschien .dot { background: var(--oranje); }
+.reactie-btn.nee .dot { background: var(--rood); }
+.reactie-btn.geen-contact .dot { background: #555; }
+.reactie-btn.selected { color: var(--wit); }
+.reactie-btn.ja.selected { border-color: var(--groen); background: rgba(0,176,80,0.12); }
+.reactie-btn.misschien.selected { border-color: var(--oranje); background: rgba(255,107,0,0.12); }
+.reactie-btn.nee.selected { border-color: var(--rood); background: rgba(232,0,29,0.12); }
+.reactie-btn.geen-contact.selected { border-color: #666; background: rgba(100,100,100,0.12); }
+
+textarea.input-field { resize: none; height: 80px; line-height: 1.5; }
+
+.btn-opslaan {
+  width: 100%;
+  background: var(--rood);
+  color: var(--wit);
+  border: none;
+  border-radius: 12px;
+  padding: 16px;
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 20px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  margin-top: 20px;
+}
+
+.lijst-wrap { padding: 0 16px; margin-top: 24px; }
+.lijst-header {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 2px;
+  color: #888;
+  margin-bottom: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.export-btn {
+  font-family: 'DM Sans', sans-serif;
+  font-size: 12px;
+  background: #222;
+  border: 1px solid #444;
+  color: #aaa;
+  padding: 5px 12px;
+  border-radius: 20px;
+  cursor: pointer;
+}
+
+.bezoek-kaart {
+  background: #1a1a1a;
+  border-radius: 12px;
+  padding: 14px;
+  margin-bottom: 10px;
+  border-left: 4px solid #333;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.bezoek-kaart.vol { border-left-color: var(--groen); }
+.bezoek-kaart.leeg { border-left-color: var(--oranje); }
+.bezoek-kaart.weg { border-left-color: var(--rood); }
+.kaart-naam { font-weight: 600; font-size: 14px; margin-bottom: 3px; }
+.kaart-meta { font-size: 12px; color: #666; }
+.kaart-reactie {
+  font-size: 11px;
+  font-weight: 600;
+  padding: 3px 8px;
+  border-radius: 20px;
+  white-space: nowrap;
+  margin-left: 10px;
+}
+.kaart-reactie.ja { background: rgba(0,176,80,0.15); color: var(--groen); }
+.kaart-reactie.misschien { background: rgba(255,107,0,0.15); color: var(--oranje); }
+.kaart-reactie.nee { background: rgba(232,0,29,0.15); color: var(--rood); }
+.kaart-reactie.geen-contact { background: rgba(136,136,136,0.15); color: #888; }
+
+.leeg-staat { text-align: center; color: #444; font-size: 13px; padding: 30px 0; }
+
+.toast {
+  position: fixed;
+  bottom: 30px;
+  left: 50%;
+  transform: translateX(-50%) translateY(80px);
+  background: var(--groen);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 30px;
+  font-weight: 600;
+  font-size: 14px;
+  transition: transform 0.3s ease;
+  z-index: 999;
+}
+.toast.show { transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-title">GRABNGO<br>BEZOEK</div>
+  <div class="header-dag" id="daginfo"></div>
+</div>
+
+<div class="stats">
+  <div class="stat"><div class="stat-num wit" id="stat-totaal">0</div><div class="stat-label">Bezocht</div></div>
+  <div class="stat"><div class="stat-num groen" id="stat-ja">0</div><div class="stat-label">Akkoord</div></div>
+  <div class="stat"><div class="stat-num oranje" id="stat-misschien">0</div><div class="stat-label">Twijfel</div></div>
+  <div class="stat"><div class="stat-num rood" id="stat-nee">0</div><div class="stat-label">Nee</div></div>
+</div>
+
+<div class="form-wrap">
+  <div class="section-label">Bedrijfsnaam</div>
+  <input type="text" class="input-field" id="naam" placeholder="Naam klant of locatie" autocomplete="off">
+
+  <div class="section-label">Contactpersoon</div>
+  <input type="text" class="input-field" id="contact" placeholder="Naam contactpersoon" autocomplete="off">
+
+  <div class="section-label">Telefoonnummer</div>
+  <input type="tel" class="input-field" id="telefoon" placeholder="06-..." autocomplete="off">
+
+  <div class="section-label">E-mailadres</div>
+  <input type="email" class="input-field" id="email" placeholder="info@bedrijf.nl" autocomplete="off">
+
+  <div class="section-label">KVK-nummer</div>
+  <input type="text" class="input-field" id="kvk" placeholder="12345678" autocomplete="off" inputmode="numeric">
+
+  <div class="section-label">Display status</div>
+  <div class="status-grid">
+    <div class="status-btn vol" onclick="selectStatus('vol', this)"><div class="icon">✅</div><div class="label">Vol / Goed</div></div>
+    <div class="status-btn leeg" onclick="selectStatus('leeg', this)"><div class="icon">📦</div><div class="label">Leeg / Bijna leeg</div></div>
+    <div class="status-btn weg" onclick="selectStatus('weg', this)"><div class="icon">❌</div><div class="label">Display weg</div></div>
+    <div class="status-btn onbekend" onclick="selectStatus('onbekend', this)"><div class="icon">❓</div><div class="label">Niet gezien</div></div>
+  </div>
+
+  <div class="section-label">Reactie klant</div>
+  <div class="reactie-grid">
+    <div class="reactie-btn ja" onclick="selectReactie('ja', this)"><div class="dot"></div>Ja, gaat door</div>
+    <div class="reactie-btn misschien" onclick="selectReactie('misschien', this)"><div class="dot"></div>Twijfelt - opvolgen</div>
+    <div class="reactie-btn nee" onclick="selectReactie('nee', this)"><div class="dot"></div>Nee - stopt ermee</div>
+    <div class="reactie-btn geen-contact" onclick="selectReactie('geen-contact', this)"><div class="dot"></div>Niemand bereikt</div>
+  </div>
+
+  <div class="section-label">Notitie</div>
+  <textarea class="input-field" id="notitie" placeholder="Bijv. display staat achteraan, bel maandag terug..."></textarea>
+
+  <button class="btn-opslaan" onclick="opslaan()">OPSLAAN</button>
+</div>
+
+<div class="lijst-wrap">
+  <div class="lijst-header">
+    <span>VANDAAG</span>
+    <button class="export-btn" onclick="exporteer()">Exporteer CSV</button>
+  </div>
+  <div id="lijst"><div class="leeg-staat">Nog geen bezoeken vandaag</div></div>
+</div>
+
+<div class="toast" id="toast">✓ Opgeslagen</div>
+
+<script>
+  let geselecteerdeStatus = null;
+  let geselecteerdeReactie = null;
+  let bezoeken = JSON.parse(localStorage.getItem('grabngo_bezoeken') || '[]');
+
+  const nu = new Date();
+  const dagen = ['Zo','Ma','Di','Wo','Do','Vr','Za'];
+  const maanden = ['jan','feb','mrt','apr','mei','jun','jul','aug','sep','okt','nov','dec'];
+  document.getElementById('daginfo').innerHTML =
+    `${dagen[nu.getDay()]} ${nu.getDate()} ${maanden[nu.getMonth()]}<br>${nu.getFullYear()}`;
+
+  function selectStatus(type, el) {
+    document.querySelectorAll('.status-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    geselecteerdeStatus = type;
+  }
+
+  function selectReactie(type, el) {
+    document.querySelectorAll('.reactie-btn').forEach(b => b.classList.remove('selected'));
+    el.classList.add('selected');
+    geselecteerdeReactie = type;
+  }
+
+  function opslaan() {
+    const naam = document.getElementById('naam').value.trim();
+    if (!naam) { alert('Vul een bedrijfsnaam in.'); return; }
+    if (!geselecteerdeStatus) { alert('Selecteer de display status.'); return; }
+    if (!geselecteerdeReactie) { alert('Selecteer de reactie van de klant.'); return; }
+
+    const bezoek = {
+      id: Date.now(),
+      tijd: new Date().toLocaleTimeString('nl-NL', {hour:'2-digit', minute:'2-digit'}),
+      naam,
+      contact: document.getElementById('contact').value.trim(),
+      telefoon: document.getElementById('telefoon').value.trim(),
+      email: document.getElementById('email').value.trim(),
+      kvk: document.getElementById('kvk').value.trim(),
+      status: geselecteerdeStatus,
+      reactie: geselecteerdeReactie,
+      notitie: document.getElementById('notitie').value.trim(),
+      datum: new Date().toLocaleDateString('nl-NL')
+    };
+
+    bezoeken.unshift(bezoek);
+    localStorage.setItem('grabngo_bezoeken', JSON.stringify(bezoeken));
+
+    ['naam','contact','telefoon','email','kvk','notitie'].forEach(id => document.getElementById(id).value = '');
+    document.querySelectorAll('.status-btn, .reactie-btn').forEach(b => b.classList.remove('selected'));
+    geselecteerdeStatus = null;
+    geselecteerdeReactie = null;
+
+    toonToast();
+    renderLijst();
+    updateStats();
+  }
+
+  function toonToast() {
+    const t = document.getElementById('toast');
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2000);
+  }
+
+  const reactieLabel = { 'ja':'Akkoord', 'misschien':'Twijfelt', 'nee':'Nee', 'geen-contact':'Geen contact' };
+
+  function renderLijst() {
+    const el = document.getElementById('lijst');
+    const vandaag = new Date().toLocaleDateString('nl-NL');
+    const v = bezoeken.filter(b => b.datum === vandaag);
+    if (v.length === 0) { el.innerHTML = '<div class="leeg-staat">Nog geen bezoeken vandaag</div>'; return; }
+    el.innerHTML = v.map(b => `
+      <div class="bezoek-kaart ${b.status}">
+        <div>
+          <div class="kaart-naam">${b.naam}</div>
+          <div class="kaart-meta">${b.tijd}${b.contact ? ' · ' + b.contact : ''}${b.telefoon ? ' · ' + b.telefoon : ''}</div>
+          ${b.notitie ? `<div class="kaart-meta" style="margin-top:4px;color:#555">${b.notitie}</div>` : ''}
+        </div>
+        <div class="kaart-reactie ${b.reactie}">${reactieLabel[b.reactie]}</div>
+      </div>`).join('');
+  }
+
+  function updateStats() {
+    const vandaag = new Date().toLocaleDateString('nl-NL');
+    const v = bezoeken.filter(b => b.datum === vandaag);
+    document.getElementById('stat-totaal').textContent = v.length;
+    document.getElementById('stat-ja').textContent = v.filter(b => b.reactie === 'ja').length;
+    document.getElementById('stat-misschien').textContent = v.filter(b => b.reactie === 'misschien').length;
+    document.getElementById('stat-nee').textContent = v.filter(b => b.reactie === 'nee').length;
+  }
+
+  function exporteer() {
+    if (bezoeken.length === 0) { alert('Geen bezoeken om te exporteren.'); return; }
+    const headers = ['Datum','Tijd','Naam','Contactpersoon','Telefoon','Email','KVK','Display Status','Reactie','Notitie'];
+    const rijen = bezoeken.map(b => [b.datum,b.tijd,b.naam,b.contact,b.telefoon,b.email,b.kvk,b.status,reactieLabel[b.reactie],b.notitie]
+      .map(v => `"${(v||'').replace(/"/g,'""')}"`).join(','));
+    const csv = [headers.join(','), ...rijen].join('\n');
+    const blob = new Blob(['\uFEFF'+csv], {type:'text/csv;charset=utf-8'});
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = `GrabNGo_Bezoeken_${new Date().toLocaleDateString('nl-NL').replace(/\//g,'-')}.csv`;
+    a.click();
+  }
+
+  renderLijst();
+  updateStats();
+</script>
+</body>
+</html>

@@ -7,3 +7,14 @@
     { "src": "/(.*)", "dest": "/index.html" }
   ]
 }
+{
+  "version": 2,
+  "builds": [
+    { "src": "*.html", "use": "@vercel/static" }
+  ],
+  "routes": [
+    { "src": "/bestel.html", "dest": "/bestel.html" },
+    { "src": "/bezoek.html", "dest": "/bezoek.html" },
+    { "src": "/(.*)", "dest": "/index.html" }
+  ]
+}

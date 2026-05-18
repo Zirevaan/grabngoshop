@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GrabNGo — Bestelformulier</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: Arial, sans-serif; background: #f2f2f2; padding: 12px; }
+  .page { max-width: 680px; margin: 0 auto; background: white; border-radius: 10px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+  .header { background: #E5000A; padding: 14px 20px; }
+  .header-title { color: white; font-size: 17px; font-weight: bold; }
+  .header-sub { color: rgba(255,255,255,0.8); font-size: 11px; margin-top: 3px; }
+  .klant { padding: 14px 20px; background: #f9f9f9; border-bottom: 1px solid #eee; display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .klant-title { grid-column: 1/-1; font-size: 10px; font-weight: bold; color: #999; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 2px; }
+  .field { display: flex; flex-direction: column; gap: 3px; }
+  .field.full { grid-column: 1/-1; }
+  .field label { font-size: 10px; color: #aaa; }
+  .field input { border: 1px solid #ddd; border-radius: 6px; padding: 5px 9px; font-size: 13px; color: #222; height: 32px; font-family: Arial, sans-serif; }
+  .field input:focus { outline: none; border-color: #E5000A; }
+  .prod-header { display: grid; grid-template-columns: 24px 1fr 56px 64px 72px; padding: 6px 20px; background: #f0f0f0; border-bottom: 1px solid #ddd; font-size: 10px; color: #999; font-weight: bold; gap: 8px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .cat-label { padding: 5px 20px; font-size: 10px; font-weight: bold; color: #E5000A; background: #fff5f5; border-bottom: 1px solid #fdeaea; }
+  .prod-row { display: grid; grid-template-columns: 24px 1fr 56px 64px 72px; padding: 7px 20px; border-bottom: 1px solid #f2f2f2; align-items: center; gap: 8px; background: white; }
+  .rn { font-size: 10px; color: #ccc; text-align: center; }
+  .pname { font-size: 12px; color: #222; line-height: 1.3; }
+  .psub { font-size: 10px; color: #aaa; }
+  .pcode { font-size: 10px; color: #ccc; }
+  .pprice { font-size: 12px; color: #aaa; text-align: right; }
+  .qty { width: 56px; height: 32px; border: 1px solid #ddd; border-radius: 6px; padding: 0 6px; font-size: 13px; text-align: center; font-family: Arial, sans-serif; color: #222; }
+  .qty:focus { outline: none; border-color: #E5000A; }
+  .sub { font-size: 12px; color: #ccc; text-align: right; }
+  .totaal-bar { padding: 12px 20px; background: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; }
+  .totaal-lbl { font-size: 11px; color: #aaa; }
+  .totaal-amt { font-size: 22px; font-weight: bold; color: #222; }
+  .opm { padding: 10px 20px; border-top: 1px solid #eee; }
+  .opm label { font-size: 10px; color: #aaa; display: block; margin-bottom: 4px; text-transform: uppercase; letter-spacing: 0.3px; }
+  .opm textarea { width: 100%; border: 1px solid #ddd; border-radius: 6px; padding: 7px 10px; font-size: 12px; font-family: Arial, sans-serif; resize: none; height: 56px; color: #222; }
+  .footer { padding: 12px 20px; background: #f9f9f9; border-top: 1px solid #eee; display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+  .footer-note { font-size: 11px; color: #aaa; line-height: 1.6; }
+  .footer-note strong { color: #555; }
+  .btns { display: flex; gap: 8px; flex-shrink: 0; }
+  .btn { padding: 8px 16px; border-radius: 6px; font-size: 12px; font-weight: bold; cursor: pointer; border: 1px solid #ddd; background: white; color: #444; font-family: Arial, sans-serif; }
+  .btn-red { background: #E5000A; border-color: #E5000A; color: white; }
+  @media print {
+    body { background: white; padding: 0; }
+    .page { box-shadow: none; border-radius: 0; max-width: 100%; }
+    .btns { display: none !important; }
+    .header, .cat-label { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="header">
+    <div class="header-title">GrabNGo — Bestelformulier</div>
+    <div class="header-sub">Mobile Express B.V. &nbsp;·&nbsp; Excl. BTW</div>
+  </div>
+
+  <div class="klant">
+    <div class="klant-title">Klantgegevens</div>
+    <div class="field"><label>Locatienaam</label><input id="f-naam" type="text" placeholder="Naam winkel / bedrijf"></div>
+    <div class="field"><label>Contactpersoon</label><input id="f-contact" type="text" placeholder="Naam"></div>
+    <div class="field"><label>Telefoon</label><input id="f-tel" type="tel" placeholder="06-..."></div>
+    <div class="field"><label>Datum bezoek</label><input id="f-datum" type="date"></div>
+    <div class="field full"><label>Straat + huisnummer</label><input id="f-straat" type="text" placeholder="Straat en huisnummer"></div>
+    <div class="field"><label>Postcode</label><input id="f-postcode" type="text" placeholder="1234 AB"></div>
+    <div class="field"><label>Plaats</label><input id="f-plaats" type="text" placeholder="Stad"></div>
+    <div class="field"><label>KvK nummer</label><input id="f-kvk" type="text" placeholder="12345678"></div>
+    <div class="field"><label>E-mail klant</label><input id="f-email" type="email" placeholder="info@bedrijf.nl"></div>
+  </div>
+
+  <div class="prod-header">
+    <span>#</span><span>Product</span>
+    <span style="text-align:right">Stuks</span>
+    <span style="text-align:right">Prijs</span>
+    <span style="text-align:right">Totaal</span>
+  </div>
+
+  <div class="cat-label">Display</div>
+  <div class="prod-row"><div class="rn">1</div><div><div class="pname">GrabNGo Luxe Display met 5 lades en slot</div><div class="pcode">#37001</div></div><input class="qty" type="number" min="0" max="99" placeholder="0" inputmode="numeric" data-p="41.28"><div class="pprice">€ 41,28</div><div class="sub" id="s1">—</div></div>
+
+  <div class="cat-label">Kabels — USB-A naar Lightning (8-PIN)</div>
+  <div class="prod-row"><div class="rn">2</div><div><div class="pname">Cable USB &gt; 8-PIN 1m <span class="psub">· Wit</span></div><div class="pcode">#16879</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.01"><div class="pprice">€ 2,01</div><div class="sub" id="s2">—</div></div>
+  <div class="prod-row"><div class="rn">3</div><div><div class="pname">Cable USB &gt; 8-PIN 2m <span class="psub">· Wit</span></div><div class="pcode">#16079</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.30"><div class="pprice">€ 2,30</div><div class="sub" id="s3">—</div></div>
+
+  <div class="cat-label">Kabels — USB-C naar Lightning (8-PIN)</div>
+  <div class="prod-row"><div class="rn">4</div><div><div class="pname">Cable USB-C &gt; 8-PIN 1m <span class="psub">· Wit</span></div><div class="pcode">#37000</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.88"><div class="pprice">€ 2,88</div><div class="sub" id="s4">—</div></div>
+  <div class="prod-row"><div class="rn">5</div><div><div class="pname">Cable USB-C &gt; 8-PIN 2m <span class="psub">· Wit</span></div><div class="pcode">#37002</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="3.17"><div class="pprice">€ 3,17</div><div class="sub" id="s5">—</div></div>
+
+  <div class="cat-label">Kabels — USB-A naar USB-C</div>
+  <div class="prod-row"><div class="rn">6</div><div><div class="pname">Cable USB &gt; USB-C 1m <span class="psub">· Wit</span></div><div class="pcode">#16072</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.01"><div class="pprice">€ 2,01</div><div class="sub" id="s6">—</div></div>
+  <div class="prod-row"><div class="rn">7</div><div><div class="pname">Cable USB &gt; USB-C 2m <span class="psub">· Wit</span></div><div class="pcode">#16073</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.59"><div class="pprice">€ 2,59</div><div class="sub" id="s7">—</div></div>
+  <div class="prod-row"><div class="rn">8</div><div><div class="pname">Cable USB &gt; USB-C 1m <span class="psub">· Zwart</span></div><div class="pcode">#37040</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.01"><div class="pprice">€ 2,01</div><div class="sub" id="s8">—</div></div>
+
+  <div class="cat-label">Kabels — USB-C naar USB-C</div>
+  <div class="prod-row"><div class="rn">9</div><div><div class="pname">Cable USB-C &gt; USB-C 1m <span class="psub">· Zwart</span></div><div class="pcode">#37010</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.88"><div class="pprice">€ 2,88</div><div class="sub" id="s9">—</div></div>
+  <div class="prod-row"><div class="rn">10</div><div><div class="pname">Cable USB-C &gt; USB-C 2m <span class="psub">· Zwart</span></div><div class="pcode">#37011</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="3.17"><div class="pprice">€ 3,17</div><div class="sub" id="s10">—</div></div>
+  <div class="prod-row"><div class="rn">11</div><div><div class="pname">Cable USB-C &gt; USB-C 1m <span class="psub">· Wit</span></div><div class="pcode">#16075</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="2.88"><div class="pprice">€ 2,88</div><div class="sub" id="s11">—</div></div>
+  <div class="prod-row"><div class="rn">12</div><div><div class="pname">Cable USB-C &gt; USB-C 2m <span class="psub">· Wit</span></div><div class="pcode">#37003</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="3.17"><div class="pprice">€ 3,17</div><div class="sub" id="s12">—</div></div>
+
+  <div class="cat-label">Opladers</div>
+  <div class="prod-row"><div class="rn">13</div><div><div class="pname">Wall Charger USB + USB-C 20W <span class="psub">· Zwart</span></div><div class="pcode">#37008</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="5.35"><div class="pprice">€ 5,35</div><div class="sub" id="s13">—</div></div>
+  <div class="prod-row"><div class="rn">14</div><div><div class="pname">Wall Charger USB + USB-C 20W <span class="psub">· Wit</span></div><div class="pcode">#37009</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="5.35"><div class="pprice">€ 5,35</div><div class="sub" id="s14">—</div></div>
+  <div class="prod-row"><div class="rn">15</div><div><div class="pname">Car Charger USB + USB-C 30W <span class="psub">· Zwart</span></div><div class="pcode">#37005</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="4.11"><div class="pprice">€ 4,11</div><div class="sub" id="s15">—</div></div>
+
+  <div class="cat-label">Autohouders</div>
+  <div class="prod-row"><div class="rn">16</div><div><div class="pname">Magnetic Air Vent Car Holder MINI <span class="psub">· 360°</span></div><div class="pcode">#37020</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="3.70"><div class="pprice">€ 3,70</div><div class="sub" id="s16">—</div></div>
+  <div class="prod-row"><div class="rn">17</div><div><div class="pname">Magnetic Air Vent Car Holder Clip <span class="psub">· 360°</span></div><div class="pcode">#37021</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="3.70"><div class="pprice">€ 3,70</div><div class="sub" id="s17">—</div></div>
+
+  <div class="cat-label">Audio</div>
+  <div class="prod-row"><div class="rn">18</div><div><div class="pname">USB-C Oortelefoon Pro met Mic <span class="psub">· Wit</span></div><div class="pcode">#37030</div></div><input class="qty" type="number" min="0" max="999" placeholder="0" inputmode="numeric" data-p="5.35"><div class="pprice">€ 5,35</div><div class="sub" id="s18">—</div></div>
+
+  <div class="totaal-bar">
+    <div>
+      <div class="totaal-lbl">Totaal bestelling (excl. BTW)</div>
+      <div style="font-size:10px;color:#ccc" id="tc">0 stuks</div>
+    </div>
+    <div class="totaal-amt" id="ta">€ 0,00</div>
+  </div>
+
+  <div class="opm">
+    <label>Opmerkingen / displaystatus / afspraken</label>
+    <textarea id="f-opm" placeholder="Bijv: display aangevuld, 2e display gewenst, klant belt terug..."></textarea>
+  </div>
+
+  <div class="footer">
+    <div class="footer-note">
+      Stuur ingevuld formulier naar:<br>
+      <strong>inkoop@mobile-express.nl</strong>
+    </div>
+    <div class="btns">
+      <button class="btn" onclick="resetForm()">Leegmaken</button>
+      <button class="btn btn-red" onclick="window.print()">Opslaan als PDF</button>
+    </div>
+  </div>
+
+</div>
+
+<script>
+document.getElementById("f-datum").value = new Date().toISOString().split("T")[0];
+
+document.querySelectorAll(".qty").forEach(function(inp, i) {
+  inp.addEventListener("input", function() { calc(); });
+});
+
+function calc() {
+  var rows = document.querySelectorAll(".prod-row");
+  var total = 0, count = 0, si = 1;
+  rows.forEach(function(row) {
+    var inp = row.querySelector(".qty");
+    var sub = row.querySelector(".sub");
+    if (!inp || !sub) return;
+    var q = parseInt(inp.value) || 0;
+    var p = parseFloat(inp.dataset.p) || 0;
+    if (q > 0) {
+      sub.textContent = "€ " + (q * p).toFixed(2).replace(".", ",");
+      sub.style.color = "#E5000A";
+      sub.style.fontWeight = "bold";
+    } else {
+      sub.textContent = "—";
+      sub.style.color = "#ccc";
+      sub.style.fontWeight = "normal";
+    }
+    total += q * p;
+    count += q;
+    si++;
+  });
+  document.getElementById("ta").textContent = "€ " + total.toFixed(2).replace(".", ",");
+  document.getElementById("tc").textContent = count + (count === 1 ? " stuk" : " stuks");
+}
+
+function resetForm() {
+  document.querySelectorAll(".qty").forEach(function(i) { i.value = ""; });
+  ["f-naam","f-contact","f-tel","f-datum","f-straat","f-postcode","f-plaats","f-kvk","f-email","f-opm"].forEach(function(id) {
+    var el = document.getElementById(id);
+    if (el) el.value = "";
+  });
+  document.querySelectorAll(".sub").forEach(function(e) {
+    e.textContent = "—"; e.style.color = "#ccc"; e.style.fontWeight = "normal";
+  });
+  document.getElementById("ta").textContent = "€ 0,00";
+  document.getElementById("tc").textContent = "0 stuks";
+}
+</script>
+</body>
+</html>

@@ -1,20 +1,20 @@
-￼<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="nl">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0">
 <title>GrabNGo – B2B Bestelportaal</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
-body{background:#1a1a1a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+body{background:#1a1a1a;color:#fff;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;overflow-x:hidden;width:100%}
 
-nav{background:#111;padding:16px 40px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #252525;position:sticky;top:0;z-index:100}
+nav{background:#111;padding:16px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #252525;position:sticky;top:0;z-index:100;width:100%;box-sizing:border-box}
 .nl{display:flex;flex-direction:column}
 .nl img{height:32px}
 .nl span{font-size:8.5px;letter-spacing:3px;color:#bbb;text-transform:uppercase;margin-top:4px}
 .nb{border:1px solid #666;color:#fff;padding:8px 16px;font-size:11.5px;letter-spacing:1px;text-transform:uppercase;border-radius:3px}
 
-.hero{background:#1a1a1a;padding:86px 40px 80px;text-align:center;position:relative}
+.hero{background:#1a1a1a;padding:86px 20px 80px;text-align:center;position:relative;width:100%;box-sizing:border-box;overflow:hidden}
 .hero::after{content:'';position:absolute;top:0;left:0;right:0;bottom:0;background:radial-gradient(ellipse 80% 60% at 50% 0%,rgba(255,102,0,0.1) 0%,transparent 70%);pointer-events:none}
 .hero h1{font-size:52px;font-weight:800;line-height:1.1;margin-bottom:0;position:relative}
 .hero h1 em{color:#ea5757;font-style:normal}
@@ -24,7 +24,7 @@ nav{background:#111;padding:16px 40px;display:flex;align-items:center;justify-co
 .badge{background:#1d1d1d;border:1px solid #444;padding:8px 15px;border-radius:20px;font-size:13px;color:#ddd;display:flex;align-items:center;gap:7px}
 .dot{width:7px;height:7px;background:#ea5757;border-radius:50%;flex-shrink:0}
 
-.main{max-width:1200px;margin:0 auto;padding:0 40px 80px}
+.main{max-width:1200px;margin:0 auto;padding:0 20px 80px;box-sizing:border-box}
 .sh{padding:52px 0 0}
 .st{font-size:25px;font-weight:700}
 .st em{color:#ea5757;font-style:normal}
@@ -89,7 +89,7 @@ textarea.inp{resize:vertical;min-height:94px}
 .success h3{color:#4caf50;font-size:19px;margin-bottom:7px}
 .success p{color:#777;font-size:13.5px}
 
-footer{background:#0e0e0e;border-top:1px solid #1e1e1e;padding:46px 40px 26px}
+footer{background:#0e0e0e;border-top:1px solid #1e1e1e;padding:46px 20px 26px;box-sizing:border-box;width:100%;overflow:hidden}
 .fi{max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-start;gap:40px;flex-wrap:wrap}
 .fl img{height:24px;margin-bottom:9px}
 .ftag{font-size:12.5px;color:#aaa;max-width:250px;line-height:1.6}
@@ -98,6 +98,32 @@ footer{background:#0e0e0e;border-top:1px solid #1e1e1e;padding:46px 40px 26px}
 .fln{font-size:12.5px;color:#bbb;line-height:1.95}
 .fln span{color:#fff}
 .fbot{max-width:1200px;margin:22px auto 0;padding-top:18px;border-top:1px solid #333;display:flex;justify-content:space-between;font-size:11.5px;color:#888;flex-wrap:wrap;gap:5px}
+
+@media(max-width:480px){
+  nav{padding:12px 16px;}
+  .nl img{height:24px;}
+  .nb{font-size:9px;padding:6px 8px;letter-spacing:0.5px;}
+  .hero{padding:50px 20px 50px;}
+  .hero h1{font-size:32px;}
+  .hero-logo{height:44px !important;margin:12px auto 20px !important;}
+  .hero p{font-size:13px;}
+  .badges{gap:7px;}
+  .badge{font-size:11px;padding:6px 10px;}
+  .main{padding:0 16px 60px;}
+  .sh{padding-top:36px;}
+  .st{font-size:20px;}
+  .frow{grid-template-columns:1fr !important;}
+  .fi{flex-direction:column;gap:24px;}
+  .fr{text-align:left;}
+  footer{padding:36px 20px 20px;}
+  .fbot{flex-direction:column;gap:4px;}
+  .cartbox{padding:14px 14px;}
+  .fw{margin-top:32px;}
+}
+@media(max-width:360px){
+  .hero h1{font-size:26px;}
+  .hero-logo{height:36px !important;}
+}
 </style>
 </head>
 <body>
@@ -375,7 +401,7 @@ footer{background:#0e0e0e;border-top:1px solid #1e1e1e;padding:46px 40px 26px}
     <div class="fr">
       <div class="fco">Mobile Express B.V.</div>
       <div class="fln">De Entree 201, 1101HG Amsterdam</div>
-      <div class="fln">Tel &nbsp;<span>+31 6 48 044 140</span></div>
+      <div class="fln">Tel &nbsp;<span style="color:#fff">+31 6 48 044 140</span></div>
       <div class="fln">E-mail &nbsp;<span>Inkoop@mobile-express.nl</span></div>
       <div class="fln">Website &nbsp;<span>www.grabngoshop.nl</span></div>
       <div class="fln">KvK &nbsp;<span>91946514</span></div>

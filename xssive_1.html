@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Xssive Bestel">
+<title>Xssive Bestelformulier — Mobile Express B.V.</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#111;--accent:#E5000A;
+  --bg:#f2f2f7;--card:#fff;--border:#e0e0e0;
+  --text:#111;--muted:#888;--input:#f5f5f5;
+}
+body{font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;background:var(--bg);color:var(--text);font-size:15px;padding-bottom:110px}
+
+/* HEADER */
+.hdr{background:var(--primary);color:#fff;padding:14px 16px 12px;position:sticky;top:0;z-index:100;display:flex;align-items:center;justify-content:space-between}
+.hdr-title{font-size:18px;font-weight:700;letter-spacing:-.3px}
+.hdr-sub{font-size:11px;color:#888;margin-top:2px}
+.cart-pill{background:var(--accent);color:#fff;border:none;border-radius:20px;padding:7px 16px;font-size:13px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.cart-num{background:#fff;color:var(--accent);border-radius:10px;padding:1px 7px;font-size:11px;font-weight:700}
+
+/* TABS */
+.tabs{display:flex;overflow-x:auto;background:#fff;border-bottom:1px solid var(--border);padding:0 8px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{border:none;background:none;border-bottom:3px solid transparent;padding:11px 13px;font-size:13px;font-weight:500;color:var(--muted);cursor:pointer;white-space:nowrap;font-family:inherit;flex-shrink:0;-webkit-tap-highlight-color:transparent}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
+
+/* SECTION */
+.section{padding:14px 12px 0}
+.sec-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:10px;padding-left:2px;display:flex;align-items:center;gap:6px}
+.sec-dot{width:8px;height:8px;border-radius:50%;display:inline-block;flex-shrink:0}
+
+/* PRODUCT CARD */
+.prod-card{background:#fff;border-radius:12px;margin-bottom:8px;padding:13px 14px;display:flex;align-items:center;gap:12px;box-shadow:0 1px 3px rgba(0,0,0,.06)}
+.prod-info{flex:1;min-width:0}
+.prod-name{font-size:14px;font-weight:600;line-height:1.35;margin-bottom:3px}
+.prod-meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.prod-sku{font-size:11px;color:var(--muted)}
+.prod-price{font-size:15px;font-weight:700;color:var(--text)}
+
+/* QTY */
+.qty-wrap{display:flex;align-items:center;border:1.5px solid var(--border);border-radius:10px;overflow:hidden;flex-shrink:0}
+.qty-btn{width:38px;height:38px;border:none;background:var(--input);font-size:22px;cursor:pointer;color:var(--text);display:flex;align-items:center;justify-content:center;font-family:inherit;-webkit-tap-highlight-color:transparent;line-height:1}
+.qty-btn:active{background:#ddd}
+.qty-num{width:40px;height:38px;border:none;text-align:center;font-size:15px;font-weight:700;font-family:inherit;background:#fff;color:var(--text);outline:none;-moz-appearance:textfield}
+.qty-num::-webkit-outer-spin-button,.qty-num::-webkit-inner-spin-button{-webkit-appearance:none}
+.qty-num.has-qty{color:var(--accent)}
+
+/* BOTTOM BAR */
+.bottom-bar{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--border);padding:12px 16px 24px;z-index:100;box-shadow:0 -4px 20px rgba(0,0,0,.1)}
+.bottom-totals{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+.bottom-lbl{font-size:12px;color:var(--muted)}
+.bottom-amt{font-size:18px;font-weight:700}
+.bottom-items{font-size:12px;color:var(--muted)}
+.btn-main{width:100%;background:var(--accent);color:#fff;border:none;border-radius:12px;padding:15px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
+.btn-main:active{background:#c0000a}
+.btn-main:disabled{background:#ccc;cursor:not-allowed}
+
+/* MODAL */
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;align-items:flex-end}
+.modal.show{display:flex}
+.modal-box{background:#fff;border-radius:22px 22px 0 0;width:100%;max-height:92vh;overflow-y:auto;padding:0 0 40px}
+.modal-drag{padding:12px 0 0;display:flex;justify-content:center}
+.modal-drag span{width:36px;height:4px;background:#ddd;border-radius:2px;display:block}
+.modal-head{padding:4px 20px 16px;border-bottom:1px solid #f0f0f0}
+.modal-head h2{font-size:18px;font-weight:700}
+.modal-head p{font-size:12px;color:var(--muted);margin-top:2px}
+
+/* ORDER LINES */
+.order-lines{padding:12px 20px}
+.order-line{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 0;border-bottom:1px solid #f5f5f5;gap:8px}
+.order-line:last-child{border-bottom:none}
+.ol-name{font-size:13px;line-height:1.4;flex:1}
+.ol-qty{font-size:12px;color:var(--muted);white-space:nowrap}
+.ol-price{font-size:14px;font-weight:700;white-space:nowrap}
+
+/* TOTALS */
+.totals-box{margin:0 20px;background:#f8f8f8;border-radius:12px;padding:14px 16px}
+.tot-row{display:flex;justify-content:space-between;font-size:14px;margin-bottom:6px}
+.tot-row:last-child{margin:0;font-weight:700;font-size:16px;padding-top:10px;border-top:1px solid #e8e8e8;margin-top:4px}
+.tot-row .lbl{color:var(--muted)}
+.tot-row:last-child .lbl{color:var(--text)}
+
+/* KLANT FORM */
+.form-section{padding:16px 20px 0}
+.form-section h3{font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:12px}
+.form-group{margin-bottom:10px}
+.form-lbl{display:block;font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--muted);margin-bottom:4px}
+.form-inp{width:100%;border:1.5px solid var(--border);border-radius:10px;padding:12px 14px;font-size:15px;font-family:inherit;outline:none;background:var(--input);color:var(--text)}
+.form-inp:focus{border-color:var(--accent);background:#fff}
+textarea.form-inp{resize:none;min-height:70px}
+.form-row{display:flex;gap:8px}
+.form-row .form-group{flex:1}
+
+/* ACTION BUTTONS */
+.action-btns{padding:14px 20px 0;display:flex;gap:8px}
+.btn-action{flex:1;background:var(--input);border:1.5px solid var(--border);border-radius:12px;padding:14px 8px;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;color:var(--text);text-align:center;-webkit-tap-highlight-color:transparent}
+.btn-action:active{background:#e0e0e0}
+.btn-reset{margin:10px 20px 0;width:calc(100% - 40px);background:none;border:1.5px solid #ffd0d0;border-radius:12px;padding:12px;font-size:14px;font-weight:600;color:var(--accent);cursor:pointer;font-family:inherit;-webkit-tap-highlight-color:transparent}
+
+/* EMPTY */
+.empty-state{text-align:center;padding:60px 20px;color:var(--muted)}
+.empty-icon{font-size:52px;margin-bottom:12px}
+.empty-txt{font-size:14px;line-height:1.6}
+</style>
+</head>
+<body>
+
+<header class="hdr">
+  <div>
+    <div class="hdr-title">Xssive Bestel</div>
+    <div class="hdr-sub">Mobile Express B.V.</div>
+  </div>
+  <button class="cart-pill" onclick="openModal()">
+    🛒 <span class="cart-num" id="cartNum">0</span>
+  </button>
+</header>
+
+<!-- KLANTGEGEVENS BOVENAAN -->
+<div style="background:#fff;border-bottom:1px solid var(--border);padding:14px 16px">
+  <div style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:10px">👤 Klantgegevens</div>
+  <div style="display:flex;flex-direction:column;gap:8px">
+    <input class="form-inp" id="fBedrijf" type="text" placeholder="Bedrijfsnaam *" autocomplete="organization">
+    <div style="display:flex;gap:8px">
+      <input class="form-inp" id="fContact" type="text" placeholder="Contactpersoon" style="flex:1">
+      <input class="form-inp" id="fKvk" type="text" placeholder="KvK-nummer" inputmode="numeric" style="flex:1">
+    </div>
+    <input class="form-inp" id="fAdres" type="text" placeholder="Adres" autocomplete="street-address">
+    <div style="display:flex;gap:8px">
+      <input class="form-inp" id="fPostcode" type="text" placeholder="Postcode" style="flex:0 0 110px">
+      <input class="form-inp" id="fPlaats" type="text" placeholder="Plaats" style="flex:1">
+    </div>
+    <input class="form-inp" id="fEmail" type="email" placeholder="E-mailadres" inputmode="email">
+    <input class="form-inp" id="fTel" type="tel" placeholder="Telefoonnummer" inputmode="tel">
+    <textarea class="form-inp" id="fOpmerking" rows="2" placeholder="Opmerkingen (optioneel)"></textarea>
+  </div>
+</div>
+
+<div class="tabs" id="tabsBar">
+  <button class="tab active" onclick="showCat('powerbanks',this)">Powerbanks</button>
+  <button class="tab" onclick="showCat('mag',this)">Mag. Houders</button>
+  <button class="tab" onclick="showCat('car',this)">Auto</button>
+  <button class="tab" onclick="showCat('wand',this)">Wandladers</button>
+  <button class="tab" onclick="showCat('kabels',this)">Kabels</button>
+  <button class="tab" onclick="showCat('audio',this)">Audio & Overig</button>
+</div>
+
+<div id="productsArea"></div>
+
+<div class="bottom-bar">
+  <div class="bottom-totals">
+    <div>
+      <div class="bottom-lbl">Totaal excl. BTW</div>
+      <div class="bottom-amt" id="btmTotal">€ 0,00</div>
+    </div>
+    <div style="text-align:right">
+      <div class="bottom-lbl">Artikelen</div>
+      <div class="bottom-items" id="btmItems">0 stuks</div>
+    </div>
+  </div>
+  <button class="btn-main" id="btnBekijk" onclick="openModal()" disabled>Bestelling bekijken →</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal" id="modal" onclick="bgClose(event)">
+  <div class="modal-box" id="modalBox">
+    <div class="modal-drag"><span></span></div>
+    <div class="modal-head">
+      <h2>Bestelling</h2>
+      <p id="modalSub">Mobile Express B.V.</p>
+    </div>
+
+    <div class="order-lines" id="orderLines"></div>
+
+    <div class="totals-box" id="totalsBox"></div>
+
+    <div class="action-btns">
+      <button class="btn-action" onclick="mailBestelling()">✉️ Mail naar mij</button>
+      <button class="btn-action" onclick="printBestelling()">🖨️ PDF / Print</button>
+    </div>
+    <button class="btn-reset" onclick="resetAll()">🗑️ Wis alles &amp; begin opnieuw</button>
+  </div>
+</div>
+
+<script>
+const CATS = {
+  powerbanks:{label:'Powerbanks',color:'#00b86b',items:[
+    {id:'pb1',name:'PD22.5W Mini Powerbank 5000mAh XSS-PB18-CL',sku:'8082500',price:11.00},
+    {id:'pb2',name:'Premium Mini Powerbank USB-C + iPhone 5000mAh XSS-PB40CB',sku:'8078237',price:10.62},
+    {id:'pb3',name:'Magnetic Wireless Powerbank + Cable 10.000mAh XS-PB51B — Zwart',sku:'8014884',price:17.00},
+    {id:'pb4',name:'15W Magnetic Wireless Powerbank XSS-PB28NW — Wit',sku:'8043655',price:16.00},
+    {id:'pb5',name:'Qi2 Magnetic Wireless Powerbank + Cable 10.000mAh XS-PB43NW — Wit',sku:'8074192',price:29.00},
+    {id:'pb6',name:'Mini Powerbank Fast Charge + Cable 10000mAh XSS-PB45 Mini — Zwart',sku:'8923414',price:17.00},
+    {id:'pb7',name:'30W Powerbank Fast Charge + Cable 10000mAh XSS-PB49B — Zwart',sku:'8013788',price:19.00},
+    {id:'pb8',name:'3in1 Magnetic 15W Powerbank + Cable 10000mAh XSS-PB53B — Zwart',sku:'8074246',price:22.00},
+    {id:'pb9',name:'Powerbank Ultra Fast Charge PD45W + Kabel 20000mAh XSS-PB55',sku:'8081145',price:28.00},
+  ]},
+  mag:{label:'Magnetische Autohouders',color:'#4f8ef7',items:[
+    {id:'m1',name:'Magnetic Car Phone Holder XSS-CHMS6',sku:'8790146',price:7.00},
+    {id:'m2',name:'Dashboard Magnetic Car Holder XSS-CHMS2',sku:'8711820',price:6.50},
+    {id:'m3',name:'Magnetic Air Vent Car Holder XSS-CH102N',sku:'8712919',price:5.00},
+    {id:'m4',name:'Magnetic Air Vent Car Holder XSS-CH102N2',sku:'8071061',price:5.00},
+    {id:'m5',name:'Magnetic Car Phone Holder XSS-CHMS5GR — Groen',sku:'8007961',price:5.00},
+    {id:'m6',name:'Qi2 25W Magnetic Wireless Car Charger Holder XSS-CH130',sku:'8046359',price:20.00},
+  ]},
+  car:{label:'Autohouders & Autoladers',color:'#f7a14f',items:[
+    {id:'c1',name:'Air Vent Car Phone Holder XSS-CH132',sku:'8919592',price:6.00},
+    {id:'c2',name:'Vacuum Cup Car Holder XSS-CH134',sku:'8013399',price:7.00},
+    {id:'c3',name:'Car Holder Suction Cup + Windshield XSS-CH105',sku:'8013306',price:7.00},
+    {id:'c4',name:'PD 60W Fast Car Charger with Spring Cable XSS-CC48 2IN1',sku:'8015973',price:10.00},
+    {id:'c5',name:'30W PD Mini Fast Car Charger XSS-CC43N',sku:'8015935',price:5.50},
+    {id:'c6',name:'60W PD Fast Car Charger + C-C Cable XSS-CC40N CC',sku:'8015966',price:7.00},
+    {id:'c7',name:'60W Fast Car Charger + Type-C to 8 Pin Cable XSS-CC40N CL',sku:'8015959',price:7.00},
+  ]},
+  wand:{label:'Wandladers',color:'#a14ff7',items:[
+    {id:'w1',name:'PD 20W Quick Charger + C-iPhone XSS-AC65NB CL — Zwart',sku:'8038545',price:7.00},
+    {id:'w2',name:'PD 20W Quick Charger + C-C Kabel XSS-AC65NW CC — Wit',sku:'8041514',price:7.00},
+    {id:'w3',name:'PD 20W/QC18W Dual Port Wall Charger XSS-AC64NB — Zwart',sku:'8913910',price:6.00},
+    {id:'w4',name:'PD 20W/QC18W Dual Port Wall Charger XSS-AC64NW — Wit',sku:'8046595',price:6.00},
+    {id:'w5',name:'20W PD Quick Home Charger XSS-AC65PD — Zwart',sku:'8920383',price:5.00},
+    {id:'w6',name:'20W PD Quick Home Charger XSS-AC65NW — Wit',sku:'8072211',price:5.00},
+    {id:'w7',name:'25W PD3.0 Super Fast Charger XSS-AC66NB — Zwart',sku:'8004939',price:5.50},
+    {id:'w8',name:'PD 20W Quick Charger + C-C Kabel XSS-AC65NB CC — Zwart',sku:'8912937',price:7.00},
+    {id:'w9',name:'PD 20W Quick Charger + C-iPhone XSS-AC65NW CL — Wit',sku:'8038545',price:7.00},
+    {id:'w10',name:'25W PD3.0 Super Fast Charger XSS-AC66NW — Wit',sku:'8913903',price:5.50},
+  ]},
+  kabels:{label:'Kabels',color:'#c8a800',items:[
+    {id:'k1',name:'Braided USB-C to 8-Pin Cable 1m — Wit',sku:'8933949',price:3.00},
+    {id:'k2',name:'Braided USB-C to USB-C Cable 1m — Zwart',sku:'8936667',price:3.00},
+    {id:'k3',name:'Braided USB-C to 8-Pin Cable 1m — Zwart',sku:'8937428',price:3.00},
+    {id:'k4',name:'Braided USB-A to USB-C Cable 1m — Wit',sku:'8929324',price:3.00},
+    {id:'k5',name:'Braided USB-A to 8-Pin Cable 1m — Wit',sku:'8929423',price:3.00},
+    {id:'k6',name:'Braided USB-A to USB-C Cable 1m — Zwart',sku:'8934113',price:3.00},
+    {id:'k7',name:'Braided USB-A to 8-Pin Cable 1m — Zwart',sku:'8934342',price:3.00},
+    {id:'k8',name:'Braided USB-C to USB-C Cable 1m — Wit',sku:'8933864',price:3.00},
+  ]},
+  audio:{label:'Audio & Overig',color:'#f74fa1',items:[
+    {id:'a1',name:'Wireless Earbuds XSS-TWS11 — Wit',sku:'8013160',price:28.00},
+    {id:'a2',name:'Wireless Earbuds XSS-TWS8 — Wit',sku:'8940121',price:21.00},
+    {id:'a3',name:'Wireless Earbuds with ENC+Display XSS-TWS19W — Wit',sku:'8050967',price:13.50},
+    {id:'a4',name:'TWS Open Ear Clip XSS-CLIP-B — Zwart',sku:'8055498',price:20.00},
+    {id:'a5',name:'Stereo Headphones Type-C XSS-EP18W — Wit',sku:'8015430',price:5.50},
+    {id:'a6',name:'Stereo Headphones Type-C XSS-EP18B — Zwart',sku:'8012644',price:5.50},
+    {id:'a7',name:'Stereo Earphones for iPhone XSS-EP24 — Wit',sku:'8035605',price:7.00},
+    {id:'a8',name:'Smart Finder Tag XSS-TAG',sku:'8922691',price:8.00},
+    {id:'a9',name:'7in1 USB Hub to USB-C XSS-HUB16',sku:'8014860',price:15.00},
+  ]}
+};
+
+const qty={};
+let activeCat='powerbanks';
+
+function fmt(n){return '€\u00a0'+n.toFixed(2).replace('.',',');}
+
+function renderCat(k){
+  const cat=CATS[k];
+  let h=`<div class="section" id="sec-${k}">`;
+  h+=`<div class="sec-title"><span class="sec-dot" style="background:${cat.color}"></span>${cat.label}</div>`;
+  cat.items.forEach(p=>{
+    const q=qty[p.id]||0;
+    h+=`<div class="prod-card">
+      <div class="prod-info">
+        <div class="prod-name">${p.name}</div>
+        <div class="prod-meta">
+          <span class="prod-sku">${p.sku}</span>
+          <span class="prod-price">${fmt(p.price)}</span>
+        </div>
+      </div>
+      <div class="qty-wrap">
+        <button class="qty-btn" onclick="adj('${p.id}',-1)">−</button>
+        <input class="qty-num${q>0?' has-qty':''}" id="q-${p.id}" type="number" min="0" value="${q}" onchange="setQ('${p.id}',this.value)" inputmode="numeric">
+        <button class="qty-btn" onclick="adj('${p.id}',1)">+</button>
+      </div>
+    </div>`;
+  });
+  h+='</div>';
+  return h;
+}
+
+function renderAll(){
+  document.getElementById('productsArea').innerHTML=Object.keys(CATS).map(renderCat).join('');
+  showCatOnly(activeCat);
+}
+
+function showCatOnly(k){
+  Object.keys(CATS).forEach(c=>{
+    const el=document.getElementById('sec-'+c);
+    if(el) el.style.display=c===k?'block':'none';
+  });
+}
+
+function showCat(k,btn){
+  activeCat=k;
+  showCatOnly(k);
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+function adj(id,d){
+  qty[id]=Math.max(0,(qty[id]||0)+d);
+  const el=document.getElementById('q-'+id);
+  if(el){el.value=qty[id];el.className='qty-num'+(qty[id]>0?' has-qty':'');}
+  updateBottom();
+}
+
+function setQ(id,v){
+  qty[id]=Math.max(0,parseInt(v)||0);
+  const el=document.getElementById('q-'+id);
+  if(el) el.className='qty-num'+(qty[id]>0?' has-qty':'');
+  updateBottom();
+}
+
+function getLines(){
+  const lines=[];
+  Object.keys(CATS).forEach(k=>CATS[k].items.forEach(p=>{
+    const q=qty[p.id]||0;
+    if(q>0) lines.push({...p,q,tot:q*p.price});
+  }));
+  return lines;
+}
+
+function updateBottom(){
+  const lines=getLines();
+  const total=lines.reduce((s,l)=>s+l.tot,0);
+  const stuks=lines.reduce((s,l)=>s+l.q,0);
+  document.getElementById('btmTotal').textContent=fmt(total);
+  document.getElementById('btmItems').textContent=stuks+' stuk'+(stuks!==1?'s':'');
+  document.getElementById('cartNum').textContent=stuks;
+  document.getElementById('btnBekijk').disabled=lines.length===0;
+}
+
+function openModal(){
+  const lines=getLines();
+  if(!lines.length) return;
+  const total=lines.reduce((s,l)=>s+l.tot,0);
+  const btw=total*0.21;
+  const datum=new Date().toLocaleDateString('nl-NL');
+
+  document.getElementById('orderLines').innerHTML=lines.map(l=>`
+    <div class="order-line">
+      <div>
+        <div class="ol-name">${l.name}</div>
+        <div class="ol-qty">${l.q} × ${fmt(l.price)}</div>
+      </div>
+      <div class="ol-price">${fmt(l.tot)}</div>
+    </div>`).join('');
+
+  document.getElementById('totalsBox').innerHTML=`
+    <div class="tot-row"><span class="lbl">Subtotaal excl. BTW</span><span>${fmt(total)}</span></div>
+    <div class="tot-row"><span class="lbl">BTW 21%</span><span>${fmt(btw)}</span></div>
+    <div class="tot-row"><span class="lbl">Totaal incl. BTW</span><span>${fmt(total+btw)}</span></div>`;
+
+  document.getElementById('modalSub').textContent='Mobile Express B.V. — '+datum;
+  document.getElementById('modal').classList.add('show');
+}
+
+function bgClose(e){
+  if(e.target===document.getElementById('modal'))
+    document.getElementById('modal').classList.remove('show');
+}
+
+function getFormData(){
+  return {
+    bedrijf: document.getElementById('fBedrijf').value.trim()||'—',
+    contact: document.getElementById('fContact').value.trim()||'—',
+    kvk:     document.getElementById('fKvk').value.trim()||'—',
+    adres:   document.getElementById('fAdres').value.trim()||'—',
+    postcode:document.getElementById('fPostcode').value.trim()||'—',
+    plaats:  document.getElementById('fPlaats').value.trim()||'—',
+    email:   document.getElementById('fEmail').value.trim()||'—',
+    tel:     document.getElementById('fTel').value.trim()||'—',
+    opmerking:document.getElementById('fOpmerking').value.trim(),
+  };
+}
+
+function mailBestelling(){
+  const lines=getLines();
+  const f=getFormData();
+  const total=lines.reduce((s,l)=>s+l.tot,0);
+  const btw=total*0.21;
+  const datum=new Date().toLocaleDateString('nl-NL');
+  const subj=encodeURIComponent(`Xssive bestelling — ${f.bedrijf} — ${datum}`);
+  let body=`XSSIVE BESTELFORMULIER — Mobile Express B.V.\n${'─'.repeat(46)}\n`;
+  body+=`Datum:        ${datum}\n`;
+  body+=`Bedrijf:      ${f.bedrijf}\n`;
+  body+=`Contactpersoon: ${f.contact}\n`;
+  body+=`KvK-nummer:   ${f.kvk}\n`;
+  body+=`Adres:        ${f.adres}, ${f.postcode} ${f.plaats}\n`;
+  body+=`E-mail:       ${f.email}\n`;
+  body+=`Telefoon:     ${f.tel}\n\n`;
+  body+=`BESTELDE ARTIKELEN:\n${'─'.repeat(46)}\n`;
+  lines.forEach(l=>{body+=`${l.q}× ${l.name}\n   Art.nr. ${l.sku} | ${fmt(l.price)} p.st. = ${fmt(l.tot)}\n`;});
+  body+=`${'─'.repeat(46)}\n`;
+  body+=`Subtotaal excl. BTW: ${fmt(total)}\n`;
+  body+=`BTW 21%:             ${fmt(btw)}\n`;
+  body+=`Totaal incl. BTW:    ${fmt(total+btw)}\n`;
+  if(f.opmerking) body+=`\nOpmerkingen: ${f.opmerking}\n`;
+  window.location.href=`mailto:zirevaan@mobile-express.nl?subject=${subj}&body=${encodeURIComponent(body)}`;
+}
+
+function printBestelling(){
+  const lines=getLines();
+  const f=getFormData();
+  const total=lines.reduce((s,l)=>s+l.tot,0);
+  const btw=total*0.21;
+  const datum=new Date().toLocaleDateString('nl-NL');
+  const rows=lines.map(l=>`<tr><td>${l.q}×</td><td>${l.name}<br><small style="color:#888">${l.sku}</small></td><td style="text-align:right;white-space:nowrap">${fmt(l.price)}</td><td style="text-align:right;font-weight:700;white-space:nowrap">${fmt(l.tot)}</td></tr>`).join('');
+  const w=window.open('','_blank');
+  w.document.write(`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Xssive bestelling — ${f.bedrijf}</title>
+  <style>
+    body{font-family:-apple-system,Arial,sans-serif;font-size:13px;color:#111;padding:28px;max-width:720px;margin:0 auto}
+    .logo{font-size:22px;font-weight:900;letter-spacing:-.5px;margin-bottom:4px}
+    .logo span{color:#E5000A}
+    .sub{color:#888;font-size:12px;margin-bottom:20px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;background:#f8f8f8;padding:14px;border-radius:8px;margin-bottom:20px}
+    .grid-item label{font-size:10px;text-transform:uppercase;letter-spacing:.5px;color:#888;display:block;margin-bottom:2px}
+    .grid-item span{font-size:13px;font-weight:600}
+    table{width:100%;border-collapse:collapse;margin-bottom:16px}
+    th{background:#111;color:#fff;padding:9px 10px;font-size:11px;text-align:left;text-transform:uppercase;letter-spacing:.5px}
+    td{padding:9px 10px;border-bottom:1px solid #f0f0f0;vertical-align:top;font-size:13px}
+    tr:nth-child(even) td{background:#fafafa}
+    .totals{background:#f8f8f8;border-radius:8px;padding:14px 16px;text-align:right}
+    .totals div{margin-bottom:5px;font-size:13px}
+    .totals .grand{font-size:17px;font-weight:700;padding-top:8px;border-top:1px solid #e0e0e0;margin-top:4px}
+    .footer{margin-top:24px;font-size:11px;color:#aaa;border-top:1px solid #f0f0f0;padding-top:12px}
+    @media print{th{-webkit-print-color-adjust:exact;print-color-adjust:exact}}
+  </style></head><body>
+  <div class="logo">Xssive <span>×</span> Mobile Express</div>
+  <div class="sub">Bestelformulier — ${datum}</div>
+  <div class="grid">
+    <div class="grid-item"><label>Bedrijf</label><span>${f.bedrijf}</span></div>
+    <div class="grid-item"><label>Contactpersoon</label><span>${f.contact}</span></div>
+    <div class="grid-item"><label>KvK-nummer</label><span>${f.kvk}</span></div>
+    <div class="grid-item"><label>Telefoon</label><span>${f.tel}</span></div>
+    <div class="grid-item"><label>Adres</label><span>${f.adres}</span></div>
+    <div class="grid-item"><label>Postcode & Plaats</label><span>${f.postcode} ${f.plaats}</span></div>
+    <div class="grid-item"><label>E-mailadres</label><span>${f.email}</span></div>
+    ${f.opmerking?`<div class="grid-item" style="grid-column:1/-1"><label>Opmerkingen</label><span>${f.opmerking}</span></div>`:''}
+  </div>
+  <table>
+    <thead><tr><th>#</th><th>Product</th><th style="text-align:right">Prijs</th><th style="text-align:right">Totaal</th></tr></thead>
+    <tbody>${rows}</tbody>
+  </table>
+  <div class="totals">
+    <div>Subtotaal excl. BTW: <strong>${fmt(total)}</strong></div>
+    <div>BTW 21%: <strong>${fmt(btw)}</strong></div>
+    <div class="grand">Totaal incl. BTW: ${fmt(total+btw)}</div>
+  </div>
+  <div class="footer">Mobile Express B.V. · De Entree 201, 1101HG Amsterdam · KvK 91946514 · BTW NL865826882B01 · inkoop@mobile-express.nl</div>
+  <script>window.onload=()=>window.print()<\/script>
+  </body></html>`);
+  w.document.close();
+}
+
+function resetAll(){
+  Object.keys(qty).forEach(k=>qty[k]=0);
+  ['fBedrijf','fContact','fKvk','fAdres','fPostcode','fPlaats','fEmail','fTel','fOpmerking'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(el) el.value='';
+  });
+  renderAll();
+  updateBottom();
+  document.getElementById('modal').classList.remove('show');
+}
+
+renderAll();
+updateBottom();
+</script>
+</body>
+</html>

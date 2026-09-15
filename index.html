@@ -369,7 +369,7 @@ footer{background:#0e0e0e;border-top:1px solid #1e1e1e;padding:46px 20px 26px;bo
       <div class="fg"><label class="lbl">Contactpersoon <span class="req">*</span></label><input type="text" class="inp" id="f2" placeholder="Voor- en achternaam"></div>
       <div class="fg"><label class="lbl">E-mailadres <span class="req">*</span></label><input type="email" class="inp" id="f3" placeholder="uw@bedrijf.nl"></div>
       <div class="fg"><label class="lbl">Telefoonnummer <span class="req">*</span></label><input type="tel" class="inp" id="f4" placeholder="+31 6 12345678"></div>
-      <div class="fg"><label class="lbl">BTW-nummer <span class="req">*</span></label><input type="text" class="inp" id="f5" placeholder="NL123456789B01"></div>
+      <div class="fg"><label class="lbl">KvK-nummer <span class="req">*</span></label><input type="text" class="inp" id="f5" placeholder="12345678"></div>
     </div>
     <div class="frow">
       <div class="fg"><label class="lbl">Straatnaam <span class="req">*</span></label><input type="text" class="inp" id="f6" placeholder="Straatnaam"></div>
@@ -444,9 +444,50 @@ function go(){
   var req=['f1','f2','f3','f4','f5','f6','f7','f8','f9'],miss=false;
   req.forEach(function(id){var e=document.getElementById(id);if(!e.value.trim()){e.style.borderColor='#ea5757';miss=true;}else{e.style.borderColor='';}} );
   if(miss){alert('Vul alle verplichte velden in.');return;}
-  document.getElementById('sb').style.display='none';
-  document.getElementById('sn').style.display='none';
-  var s=document.getElementById('succ');s.style.display='block';s.scrollIntoView({behavior:'smooth'});
+
+  var f = function(id){ return document.getElementById(id).value; };
+  var bestelling = items.map(function(i){ return i.qty + 'x ' + i.name + ' (' + i.sku + ')'; }).join('\n');
+
+  var payload = {
+    Bedrijfsnaam: f('f1'),
+    Contactpersoon: f('f2'),
+    Email: f('f3'),
+    Telefoonnummer: f('f4'),
+    'KvK-nummer': f('f5'),
+    Straatnaam: f('f6'),
+    Huisnummer: f('f7'),
+    Postcode: f('f8'),
+    Woonplaats: f('f9'),
+    Opmerkingen: f('f10'),
+    Bestelling: bestelling,
+    _subject: 'Nieuwe bestelling van ' + f('f1')
+  };
+
+  var sb = document.getElementById('sb');
+  var origLabel = sb.innerHTML;
+  sb.disabled = true;
+  sb.innerHTML = 'Bezig met verzenden...';
+
+  fetch('https://formspree.io/f/mgopgjaz', {
+    method: 'POST',
+    headers: { 'Accept': 'application/json', 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload)
+  }).then(function(res){
+    if(res.ok){
+      sb.style.display = 'none';
+      var s = document.getElementById('succ');
+      s.style.display = 'block';
+      s.scrollIntoView({behavior:'smooth'});
+    } else {
+      alert('Er ging iets mis bij het versturen van uw bestelling. Probeer het opnieuw of neem telefonisch contact met ons op.');
+      sb.disabled = false;
+      sb.innerHTML = origLabel;
+    }
+  }).catch(function(){
+    alert('Er ging iets mis bij het versturen van uw bestelling. Controleer uw internetverbinding en probeer het opnieuw.');
+    sb.disabled = false;
+    sb.innerHTML = origLabel;
+  });
 }
 </script>
 </body>
